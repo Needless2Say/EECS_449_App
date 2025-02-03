@@ -1,1 +1,1 @@
-# EECS_449_Project
+# EECS_449_App
