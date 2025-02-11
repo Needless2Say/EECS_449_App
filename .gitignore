@@ -1,0 +1,41 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/caloriq/node_modules
+/caloriq/.pnp
+/caloriq.pnp.*
+/caloriq.yarn/*
+!/caloriq.yarn/patches
+!/caloriq.yarn/plugins
+!/caloriq.yarn/releases
+!/caloriq.yarn/versions
+
+# testing
+/caloriq/coverage
+
+# next.js
+/caloriq/.next/
+/caloriq/out/
+
+# production
+/caloriq/build
+
+# misc
+/caloriq.DS_Store
+/caloriq*.pem
+
+# debug
+/caloriqnpm-debug.log*
+/caloriqyarn-debug.log*
+/caloriqyarn-error.log*
+/caloriq.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+/caloriq.env*
+
+# vercel
+/caloriq.vercel
+
+# typescript
+/caloriq*.tsbuildinfo
+/caloriqnext-env.d.ts
