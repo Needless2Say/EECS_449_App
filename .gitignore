@@ -39,3 +39,8 @@
 # typescript
 /caloriq*.tsbuildinfo
 /caloriqnext-env.d.ts
+
+# fastapi virtual environment
+/fastapi/.venv
+/fastapi/venv
+/fastapi/env
