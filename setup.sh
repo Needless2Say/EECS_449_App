@@ -1,12 +1,5 @@
 #!/bin/bash
 
-# make this bash file executable with the following command
-# chmod +x setup_project.sh
-
-# run the script via
-# ./setup_project.sh
-
-
 # Step 1: Create the EECS_449 folder
 mkdir EECS_449
 
@@ -29,7 +22,7 @@ cd ..
 git init
 
 # Step 8: Set up the remote repository (Replace with your actual GitHub repository URL)
-git remote add origin https://github.com/your-username/repository-name.git
+git remote add origin https://github.com/Needless2Say/EECS_449_App.git
 
 # Step 9: Verify that the remote repository is set up correctly
 git remote -v
@@ -42,3 +35,20 @@ git branch --set-upstream-to=origin/main main
 
 # Step 12: Pull the latest changes from the remote main branch
 git pull --rebase --allow-unrelated-histories origin main
+
+# Step 13: Navigate into the FastAPI directory
+mkdir -p fastapi  # Ensure the directory exists
+cd fastapi || exit
+
+# Step 14: Initialize a Python Virtual Environment
+# Ensure Python 3.12.9 is installed before running this command
+python3.12 -m venv venv
+
+# Step 15: Activate the Virtual Environment
+source venv/bin/activate  # macOS/Linux
+# venv\Scripts\activate  # Windows (uncomment if running on Windows)
+
+# Step 16: Install dependencies from requirements.txt
+pip install -r requirements.txt
+
+echo "Project setup complete!"

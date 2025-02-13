@@ -82,6 +82,28 @@ git branch --set-upstream-to=origin/main main
 git pull
 ```
 
+### 13. Navigate into the FastAPI Directory
+
+```bash
+cd EECS_449/fastapi
+```
+
+### 14. Initialize a Python Virtual Environment
+
+Ensure you have Python **3.12.9** installed, then create and activate a virtual environment:
+
+```bash
+python3.12 -m venv venv
+source venv/bin/activate  # For macOS/Linux
+venv\Scripts\activate  # For Windows
+```
+
+### 15. Install Dependencies from `requirements.txt`
+
+```bash
+pip install -r requirements.txt
+```
+
 ---
 
 ## Next Steps
