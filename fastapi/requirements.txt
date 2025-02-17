@@ -26,9 +26,11 @@ fastapi[standard]
 pydantic
 sqlalchemy
 sqlmodel
+alembic
 psycopg2
 asyncpg
 python-jose[cryptography]
 passlib[bcrypt]
 python-multipart
 pyjwt
+python-dotenv
