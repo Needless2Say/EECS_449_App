@@ -1,10 +1,22 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlmodel import create_engine, Session, text, delete, SQLModel
+from dotenv import load_dotenv
+import os
 
-SQL_ALCHEMY_DATABASE_URL = 'sqlite:///workout_app.db'
 
-engine = create_engine(SQL_ALCHEMY_DATABASE_URL, connect_args={'check_same_thread': False})
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+load_dotenv()
+SQL_ALCHEMY_DATABASE_URL = os.getenv("SQL_ALCHEMY_DATABASE_URL")
 
-Base = declarative_base()
+
+def get_engine():
+    """
+    Get Engine To Database
+    """
+    return create_engine(SQL_ALCHEMY_DATABASE_URL, echo=True)
+
+
+def get_session():
+    """
+    Get Connection and Create Session to Database
+    """
+    engine = get_engine()
+    return Session(engine)

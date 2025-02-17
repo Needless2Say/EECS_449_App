@@ -1,25 +1,49 @@
-from fastapi import FastAPI
+"""
+Main File For Running FastAPI
+"""
+from fastapi import Depends, FastAPI, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from .routers import auth, workouts, routines
+from typing import Annotated
+from sqlmodel import Session
 
-from .database import Base, engine
+# import custom routers
+# from .calorie_tracker import calorie_routes
+# from .authentication import auth_routes
 
+# import functions
+# from .authentication.auth_routes import get_current_user
+# from .db_dependencies import get_session
+
+
+# main app for FastAPI
 app = FastAPI()
 
-Base.metadata.create_all(bind=engine)
 
+# Define your allowed origins
+origins = [
+    "http://localhost:3000",
+    "https://localhost:3000",
+]
+
+
+# Add the CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['http://localhost:3000'],
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=['*'],
-    allow_headers=['*'],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+
 
 @app.get("/")
 def health_check():
+    """
+    health check for FastAPI routes
+    """
     return 'Health check complete'
 
-app.include_router(auth.router)
-app.include_router(workouts.router)
-app.include_router(routines.router)
+
+# get all routes for each website
+# app.include_router(auth_routes.router) # authentication routes
+# app.include_router(calorie_routes.router) # calorie tracker website regular routes
