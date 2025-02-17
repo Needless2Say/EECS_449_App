@@ -33,4 +33,4 @@ python-jose[cryptography]
 passlib[bcrypt]
 python-multipart
 pyjwt
-python-dotenv
+dotenv
