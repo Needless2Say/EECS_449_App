@@ -5,6 +5,8 @@ from fastapi import Depends, FastAPI, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Annotated
 from sqlmodel import Session
+from .routers import auth
+from api.database import Base, engine
 
 # import custom routers
 # from .calorie_tracker import calorie_routes
@@ -17,6 +19,8 @@ from sqlmodel import Session
 
 # main app for FastAPI
 app = FastAPI()
+
+Base.metadata.create_all(bind=engine)
 
 
 # Define your allowed origins
@@ -42,6 +46,8 @@ def health_check():
     health check for FastAPI routes
     """
     return 'Health check complete'
+
+app.include_router(auth.router)
 
 
 # get all routes for each website
