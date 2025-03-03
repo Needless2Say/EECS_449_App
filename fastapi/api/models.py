@@ -9,8 +9,8 @@ from .database import Base
 
 # Example way of defining a table in our databse, 
 # Stores username and hashed password
-class User(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    username: str = Field(unique=True, index=True)
-    hashed_password: str
+# class User(SQLModel, table=True):
+#     id: Optional[int] = Field(default=None, primary_key=True)
+#     username: str = Field(unique=True, index=True)
+#     hashed_password: str
 

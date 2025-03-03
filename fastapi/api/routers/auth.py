@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt
 from dotenv import load_dotenv
 import os
-from api.models import User
+from api.database import User
 from api.deps import db_dependency, bcrpyt_context
 
 load_dotenv()
@@ -38,10 +38,10 @@ class Token(BaseModel):
 # Verifies password with stored hashed password
 # If authentication is successful, returns User object
 def auth_user(username: str, password: str, db):
-    user = db.query(User).filter(User.username == username).first()
+    user = db.exec(User).filter(User.username == username).first()
     if not user:
         return False
-    if not bcrpyt_context.verify(password, user.hashed_password):
+    if not bcrpyt_context.verify(password, user.password_hash):
         return False
     return user
 
@@ -58,7 +58,7 @@ def create_access_token(username: str, user_id: int, expires_delta: timedelta):
 # Returns an error if username is already registered
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def create_new_user(db: db_dependency, create_user_request: UserRequest):
-    existing_user = db.query(User).filter(User.username == create_user_request.username).first()
+    existing_user = db.exec(User).filter(User.username == create_user_request.username).first()
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -66,7 +66,7 @@ async def create_new_user(db: db_dependency, create_user_request: UserRequest):
         )
     create_user_model = User(
         username=create_user_request.username,
-        hashed_password=bcrpyt_context.hash(create_user_request.password)
+        password_hash=bcrpyt_context.hash(create_user_request.password)
     )
     db.add(create_user_model)
     db.commit()
