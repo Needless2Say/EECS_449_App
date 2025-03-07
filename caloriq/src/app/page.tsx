@@ -1,101 +1,270 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+import React, {
+  useContext,
+  useState,
+  useEffect,
+  FormEvent,
+  ChangeEvent,
+} from "react";
+import axios from "axios";
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+import AuthContext from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+
+// Example interfaces you could use
+interface Workout {
+  id: number;
+  name: string;
+  description: string;
 }
+
+interface Routine {
+  id: number;
+  name: string;
+  description: string;
+  workouts?: Workout[];
+}
+
+const Home: React.FC = () => {
+  // If you have a defined type for your context, import and apply it here:
+  // const { user, logout } = useContext<AuthContextType>(AuthContext);
+  // For demonstration, we’ll simply use `any`:
+  const { user, logout } = useContext<any>(AuthContext);
+
+  // Type your state hooks
+  const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const [routines, setRoutines] = useState<Routine[]>([]);
+  const [workoutName, setWorkoutName] = useState<string>("");
+  const [workoutDescription, setWorkoutDescription] = useState<string>("");
+  const [routineName, setRoutineName] = useState<string>("");
+  const [routineDescription, setRoutineDescription] = useState<string>("");
+  const [selectedWorkouts, setSelectedWorkouts] = useState<string[]>([]);
+
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+  useEffect(() => {
+    const fetchWorkoutsAndRoutines = async () => {
+      try {
+        const storedToken = localStorage.getItem("token");
+        const [workoutsResponse, routinesResponse] = await Promise.all([
+          axios.get("http://localhost:8000/workouts/workouts", {
+            headers: { Authorization: `Bearer ${storedToken}` },
+          }),
+          axios.get("http://localhost:8000/routines", {
+            headers: { Authorization: `Bearer ${storedToken}` },
+          }),
+        ]);
+
+        setWorkouts(workoutsResponse.data);
+        setRoutines(routinesResponse.data);
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      }
+    };
+
+    fetchWorkoutsAndRoutines();
+  }, []);
+
+  const handleCreateWorkout = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post("http://localhost:8000/workouts", {
+        name: workoutName,
+        description: workoutDescription,
+      });
+      setWorkouts([...workouts, response.data]);
+      setWorkoutName("");
+      setWorkoutDescription("");
+    } catch (error) {
+      console.error("Failed to create workout:", error);
+    }
+  };
+
+  const handleCreateRoutine = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      await axios.post("http://localhost:8000/routines", {
+        name: routineName,
+        description: routineDescription,
+        workouts: selectedWorkouts,
+      });
+      setRoutineName("");
+      setRoutineDescription("");
+      setSelectedWorkouts([]);
+    } catch (error) {
+      console.error("Failed to create routine:", error);
+    }
+  };
+
+  // Handle the multi-select for workouts
+  const handleSelectWorkouts = (e: ChangeEvent<HTMLSelectElement>) => {
+    // Convert the selected <option> elements to an array of values
+    const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.value);
+    setSelectedWorkouts(selectedOptions);
+  };
+
+  return (
+    <ProtectedRoute>
+      <div className="container">
+        <h1>Welcome!</h1>
+        <button onClick={logout} className="btn btn-danger">
+          Logout
+        </button>
+
+        <div className="accordion mt-5 mb-5" id="accordionExample">
+          <div className="accordion-item">
+            <h2 className="accordion-header" id="headingOne">
+              <button
+                className="accordion-button"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseOne"
+                aria-expanded="true"
+                aria-controls="collapseOne"
+              >
+                Create Workout
+              </button>
+            </h2>
+            <div
+              id="collapseOne"
+              className="accordion-collapse collapse show"
+              aria-labelledby="headingOne"
+              data-bs-parent="#accordionExample"
+            >
+              <div className="accordion-body">
+                <form onSubmit={handleCreateWorkout}>
+                  <div className="mb-3">
+                    <label htmlFor="workoutName" className="form-label">
+                      Workout Name
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="workoutName"
+                      value={workoutName}
+                      onChange={(e) => setWorkoutName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="workoutDescription" className="form-label">
+                      Workout Description
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="workoutDescription"
+                      value={workoutDescription}
+                      onChange={(e) => setWorkoutDescription(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <button type="submit" className="btn btn-primary">
+                    Create Workout
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div className="accordion-item">
+            <h2 className="accordion-header" id="headingTwo">
+              <button
+                className="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseTwo"
+                aria-expanded="false"
+                aria-controls="collapseTwo"
+              >
+                Create Routine
+              </button>
+            </h2>
+            <div
+              id="collapseTwo"
+              className="accordion-collapse collapse"
+              aria-labelledby="headingTwo"
+              data-bs-parent="#accordionExample"
+            >
+              <div className="accordion-body">
+                <form onSubmit={handleCreateRoutine}>
+                  <div className="mb-3">
+                    <label htmlFor="routineName" className="form-label">
+                      Routine Name
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="routineName"
+                      value={routineName}
+                      onChange={(e) => setRoutineName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="routineDescription" className="form-label">
+                      Routine Description
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="routineDescription"
+                      value={routineDescription}
+                      onChange={(e) => setRoutineDescription(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="workoutSelect" className="form-label">
+                      Select Workouts
+                    </label>
+                    <select
+                      multiple
+                      className="form-control"
+                      id="workoutSelect"
+                      value={selectedWorkouts}
+                      onChange={handleSelectWorkouts}
+                    >
+                      {workouts.map((workout) => (
+                        <option key={workout.id} value={workout.id.toString()}>
+                          {workout.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <button type="submit" className="btn btn-primary">
+                    Create Routine
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3>Your routines:</h3>
+          <ul>
+            {routines.map((routine) => (
+              <div className="card" key={routine.id}>
+                <div className="card-body">
+                  <h5 className="card-title">{routine.name}</h5>
+                  <p className="card-text">{routine.description}</p>
+                  <ul className="card-text">
+                    {routine.workouts &&
+                      routine.workouts.map((workout) => (
+                        <li key={workout.id}>
+                          {workout.name}: {workout.description}
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              </div>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </ProtectedRoute>
+  );
+};
+
+export default Home;
