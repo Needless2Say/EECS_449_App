@@ -46,3 +46,5 @@
 /fastapi/env
 
 # ignore alembic folder
+__pycache__/
+*.py[cod]
