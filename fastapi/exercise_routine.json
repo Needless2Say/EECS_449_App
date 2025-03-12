@@ -1,0 +1,156 @@
+{
+    "Monday": [
+        {
+            "sets": 3,
+            "reps": 12,
+            "exercise": "push-up"
+        },
+        {
+            "sets": 3,
+            "reps": 10,
+            "exercise": "dumbbell bench press"
+        },
+        {
+            "sets": 3,
+            "reps": 12,
+            "exercise": "dumbbell fly"
+        },
+        {
+            "sets": 3,
+            "reps": 15,
+            "exercise": "plank  "
+        }
+    ],
+    "Tuesday": [
+        {
+            "sets": 3,
+            "reps": 12,
+            "exercise": "bodyweight squat"
+        },
+        {
+            "sets": 3,
+            "reps": 10,
+            "exercise": "dumbbell lunges"
+        },
+        {
+            "sets": 3,
+            "reps": 12,
+            "exercise": "glute bridge"
+        },
+        {
+            "sets": 3,
+            "reps": 15,
+            "exercise": "side plank  "
+        }
+    ],
+    "Wednesday": [
+        {
+            "sets": 3,
+            "reps": 12,
+            "exercise": "bent-over dumbbell row"
+        },
+        {
+            "sets": 3,
+            "reps": 10,
+            "exercise": "lat pulldown"
+        },
+        {
+            "sets": 3,
+            "reps": 12,
+            "exercise": "dumbbell bicep curl"
+        },
+        {
+            "sets": 3,
+            "reps": 15,
+            "exercise": "wrist curl  "
+        }
+    ],
+    "Thursday": [
+        {
+            "sets": 3,
+            "reps": 12,
+            "exercise": "push-up"
+        },
+        {
+            "sets": 3,
+            "reps": 10,
+            "exercise": "dumbbell shoulder press"
+        },
+        {
+            "sets": 3,
+            "reps": 12,
+            "exercise": "lateral raise"
+        },
+        {
+            "sets": 3,
+            "reps": 15,
+            "exercise": "plank  "
+        }
+    ],
+    "Friday": [
+        {
+            "sets": 3,
+            "reps": 12,
+            "exercise": "bodyweight squat"
+        },
+        {
+            "sets": 3,
+            "reps": 10,
+            "exercise": "dumbbell deadlift"
+        },
+        {
+            "sets": 3,
+            "reps": 12,
+            "exercise": "step-up"
+        },
+        {
+            "sets": 3,
+            "reps": 15,
+            "exercise": "side plank  "
+        }
+    ],
+    "Saturday": [
+        {
+            "sets": 3,
+            "reps": 12,
+            "exercise": "bent-over dumbbell row"
+        },
+        {
+            "sets": 3,
+            "reps": 10,
+            "exercise": "dumbbell triceps extension"
+        },
+        {
+            "sets": 3,
+            "reps": 12,
+            "exercise": "dumbbell hammer curl"
+        },
+        {
+            "sets": 3,
+            "reps": 15,
+            "exercise": "wrist curl  "
+        }
+    ],
+    "Sunday": [
+        {
+            "sets": 3,
+            "reps": 12,
+            "exercise": "push-up"
+        },
+        {
+            "sets": 3,
+            "reps": 10,
+            "exercise": "dumbbell bench press"
+        },
+        {
+            "sets": 3,
+            "reps": 12,
+            "exercise": "dumbbell fly"
+        },
+        {
+            "sets": 3,
+            "reps": 15,
+            "exercise": "plank"
+        }
+    ]
+}
