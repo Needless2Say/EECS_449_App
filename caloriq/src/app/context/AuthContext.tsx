@@ -4,58 +4,95 @@ import React, { createContext, useState, ReactNode } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-// Define the shape of your AuthContext value
-interface AuthContextType {
-  user: any; // Or replace 'any' with a more specific type if you know the user shape
-  login: (username: string, password: string) => Promise<void>;
-  logout: () => void;
+
+// interface for authentication context
+export interface AuthContextType {
+	user: any; // current user data (could be dictionary, variable, etc.)
+	login: (username: string, password: string) => Promise<void>; // function that accepts username and password, and returns a promise of void (no value)
+	logout: () => void; // function to logout user with no parameters or return value
 }
 
-// Optionally define a separate interface for your provider props
+// default initialization for AuthContext
+const defaultAuthContext: AuthContextType = {
+	user: null,
+	login: async () => {},
+	logout: () => {},
+}
+
+
+// interface for expected props for authentication context provider
 interface AuthProviderProps {
-  children: ReactNode;
+	children: ReactNode; // child components that will have access to context
 }
 
-// Create the context, defaulting to `null` initially
-// (You'll check for null in consumers or provide a non-null default)
-const AuthContext = createContext<AuthContextType | null>(null);
 
+// create new context that is of type AuthContextType or null and has default value of null
+const AuthContext = createContext<AuthContextType>(defaultAuthContext);
+
+
+// export Authentication Provider component to serve as context provider
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<any>(null);
-  const router = useRouter();
+	// initialize user variable to hold info on user
+	const [user, setUser] = useState<any>(null);
 
-  const login = async (username: string, password: string) => {
-    try {
-      const formData = new FormData();
-      formData.append("username", username);
-      formData.append("password", password);
+	// initialize router variable
+	const router = useRouter();
 
-      const response = await axios.post("http://localhost:8000/auth.token", formData, {
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      });
+	// async login function
+	const login = async (username: string, password: string) => {
+		// try following code
+		try {
+			// initialize formData object to hold data and send data on user
+			const formData = new FormData();
 
-      // Set the default Authorization header for all axios requests
-      axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.access_token}`;
-      localStorage.setItem("token", response.data.access_token);
+			// add username and password as dictionary items to formData object
+			formData.append("username", username);
+			formData.append("password", password);
 
-      setUser(response.data);
-      router.push("/"); // Redirect to home page
-    } catch (error) {
-      console.error("Login Failed: ", error);
-    }
-  };
+			// use axios to send a POST request to specified URL
+			// include formData as body of request
+			// headers tells server how to interpret data
+			const response = await axios.post("http://localhost:8000/auth/token", formData, {
+				headers: { "Content-Type": "application/x-www-form-urlencoded" },
+			});
 
-  const logout = () => {
-    setUser(null);
-    delete axios.defaults.headers.common["Authorization"];
-    router.push("/login");
-  };
+			// once response is recieved, set default Authorization header for all subsequent axios requests
+			axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.access_token}`;
 
-  return (
-    <AuthContext.Provider value={{ user, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+			// save access token in browser's local storage to persist across sessions or page refreshes
+			localStorage.setItem("token", response.data.access_token);
+
+			// set user variable to recieved in response from backend
+			setUser(response.data);
+
+			// redirect user to homepage
+			router.push("/");
+
+		} catch (error) { // catch any errors during login
+			// output error message to user
+			console.error("Login Failed: ", error);
+		}
+	};
+
+	// logout function
+	const logout = () => {
+		// set user variable to null
+		setUser(null);
+
+		// remove default Authorization header from axios so subsequent requests don't use expired token 
+		delete axios.defaults.headers.common["Authorization"];
+
+		// redirect user to login page
+		router.push("/login");
+	};
+
+	// return authentication context for use
+	return (
+		<AuthContext.Provider value={{ user, login, logout }}>
+			{children}
+		</AuthContext.Provider>
+	);
 };
 
+// export AuthContext as default export for other parts of application to use
 export default AuthContext;
