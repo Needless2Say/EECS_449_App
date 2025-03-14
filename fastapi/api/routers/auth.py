@@ -1,13 +1,15 @@
 from datetime import timedelta, datetime, timezone
-from typing import Annotated
+from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt
 from dotenv import load_dotenv
 import os
 from api.database import User
 from api.deps import db_dependency, bcrpyt_context
+from sqlmodel import select
+from api.database import Gender, ActivityLevel, FitnessGoals
 
 load_dotenv()
 
@@ -22,11 +24,27 @@ SECRET_KEY = os.getenv("AUTH_SECRET_KEY")
 ALGORITHM = os.getenv("AUTH_ALGORITHM")
 
 
-
 class UserRequest(BaseModel):
+    id: int
     username: str
     password: str
+    email: EmailStr
+    first_name: str
+    last_name: str
+    age: int
+    gender: Optional[Gender]
+    height_cm: float
+    weight_kg: float
+    activity_level: ActivityLevel = None
+    fitness_goals: list[FitnessGoals] = []
+    exercise_preference: Optional[str] = None
+    diet_preference: Optional[str] = None
+    allergies: Optional[str] = None
+    meal_prep_availability: str = None
+    exercise_availability: str = None
 
+class Config:
+    orm_mode: bool = True
 
 # Defines response structure for authentication tokens
 class Token(BaseModel):
@@ -38,10 +56,10 @@ class Token(BaseModel):
 # Verifies password with stored hashed password
 # If authentication is successful, returns User object
 def auth_user(username: str, password: str, db):
-    user = db.exec(User).filter(User.username == username).first()
+    user = db.exec(select(User).where(User.username == username)).first()
     if not user:
         return False
-    if not bcrpyt_context.verify(password, user.password_hash):
+    if not bcrpyt_context.verify(password, user.hashed_password):
         return False
     return user
 
@@ -58,7 +76,7 @@ def create_access_token(username: str, user_id: int, expires_delta: timedelta):
 # Returns an error if username is already registered
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def create_new_user(db: db_dependency, create_user_request: UserRequest):
-    existing_user = db.exec(User).filter(User.username == create_user_request.username).first()
+    existing_user = db.exec(select(User).where(User.username == create_user_request.username)).first()
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -66,7 +84,21 @@ async def create_new_user(db: db_dependency, create_user_request: UserRequest):
         )
     create_user_model = User(
         username=create_user_request.username,
-        password_hash=bcrpyt_context.hash(create_user_request.password)
+        hashed_password=bcrpyt_context.hash(create_user_request.password),
+        email=create_user_request.email,
+        first_name=create_user_request.first_name,
+        last_name=create_user_request.last_name,
+        age=create_user_request.age,
+        gender=create_user_request.gender,
+        height_cm=create_user_request.height_cm,
+        weight_kg=create_user_request.weight_kg,
+        activity_level=create_user_request.activity_level,
+        fitness_goals=create_user_request.fitness_goals,
+        exercise_preference=create_user_request.exercise_preference,
+        diet_preference=create_user_request.diet_preference,
+        allergies=create_user_request.allergies,
+        meal_prep_availability=create_user_request.meal_prep_availability,
+        exercise_availability=create_user_request.exercise_availability
     )
     db.add(create_user_model)
     db.commit()
