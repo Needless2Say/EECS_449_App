@@ -1,37 +1,106 @@
 "use client";
 
-import React, { useState, FormEvent } from "react";
+import React, { useState, useEffect, useRef, FormEvent } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+
+// define a chat message interface
+interface ChatMessage {
+    sender: "user" | "model";
+    text: string;
+}
 
 const HomePage: React.FC = () => {
     // initialize toggles for sidebar and profile menu pop up
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
-    // initialize variable to hold user's message to chatbot
+    // state for chat input and chat logs
     const [chatMessage, setChatMessage] = useState("");
+    const [chatLogs, setChatLogs] = useState<ChatMessage[]>([]);
 
-    // initialize router for redirectoring or routing user to different pages
+    // initialize router for redirecting or routing user to different pages
     const router = useRouter();
 
-    // toggle handlers for status
+    // reference for profile menu (for click outside behavior)
+    const profileMenuRef = useRef<HTMLDivElement>(null);
+
+    // toggle handlers for sidebar and profile menu
     const toggleSidebar = () => setSidebarOpen((prev) => !prev);
     const toggleProfileMenu = () => setProfileMenuOpen((prev) => !prev);
 
-    // function to handle message submit to send to chatbot in backend API
+
+    // useEffect to handle clicking outside the profile menu to close it
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                profileMenuRef.current &&
+                !profileMenuRef.current.contains(event.target as Node)
+            ) {
+                setProfileMenuOpen(false);
+            }
+        };
+
+        if (profileMenuOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [profileMenuOpen]);
+
+
+    // function to handle message submit
     const handleChatSubmit = (e: FormEvent<HTMLFormElement>) => {
+        // prevent default form submission behavior (normally reloads page)
         e.preventDefault();
-        console.log("Sending message:", chatMessage);
-        // Call your API or handle the message here
+
+        // if user's message is just empty spaces, exit function
+        if (chatMessage.trim() === "") return;
+
+        // add user's message (align right)
+        setChatLogs((prev) => [
+            ...prev,
+            { sender: "user", text: chatMessage.trim() },
+        ]);
+
+        // set user's message to empty string
         setChatMessage("");
+
+        // add temporary waiting message (align left)
+        setChatLogs((prev) => [
+            ...prev,
+            { sender: "model", text: "Waiting For Response" },
+        ]);
+
+        // after 5 seconds, remove waiting message and add final response
+        setTimeout(() => {
+            setChatLogs((prev) => {
+                // remove waiting message
+                const newLogs = prev.filter(
+                    (msg) => msg.text !== "Waiting For Response"
+                );
+
+                // add final response from model (aligned left)
+                return [...newLogs, { sender: "model", text: "CaloriQ responded" }];
+            });
+        }, 2000);
     };
+
 
     // function to logout user
     const handleLogout = () => {
         console.log("Logging out...");
-        // login function will be put in eventually
+        // logout logic here
     };
+
+
+    // function to handle new chat (clear chat logs and reset home screen)
+    const handleNewChat = () => {
+        setChatLogs([]);
+        // optionally reset the chatMessage too
+        setChatMessage("");
+    };
+
 
     return (
         <div className="min-h-screen bg-gray-100 relative text-black">
@@ -42,8 +111,8 @@ const HomePage: React.FC = () => {
                     <Image src="/apple.png" alt="Apple" width={40} height={40} />
                 </div>
 
-                {/* CaloriQ Title */}
-                <h1 className="text-2xl md:text-3xl font-bold">CaloriQ</h1>
+                {/* Enlarged CaloriQ Title */}
+                <h1 className="text-3xl font-bold">CaloriQ</h1>
 
                 {/* Broccoli Image */}
                 <div>
@@ -61,7 +130,10 @@ const HomePage: React.FC = () => {
                     >
                         ☰
                     </button>
-                    <button className="px-3 py-1 border rounded hover:bg-gray-200">
+                    <button
+                        onClick={handleNewChat}
+                        className="px-3 py-1 border rounded hover:bg-gray-200"
+                    >
                         New Chat
                     </button>
                 </div>
@@ -79,9 +151,12 @@ const HomePage: React.FC = () => {
                         />
                     </button>
 
-                    {/* Profile Menu */}
+                    {/* Profile Menu with rounded corners */}
                     {profileMenuOpen && (
-                        <div className="absolute top-10 right-0 w-40 bg-white border shadow-md z-10">
+                        <div
+                            ref={profileMenuRef}
+                            className="absolute top-10 right-0 w-40 bg-white border shadow-md z-10 rounded-lg"
+                        >
                             <ul className="flex flex-col">
                                 <li className="p-2 hover:bg-gray-100 cursor-pointer">Profile</li>
                                 <li className="p-2 hover:bg-gray-100 cursor-pointer">Settings</li>
@@ -99,17 +174,23 @@ const HomePage: React.FC = () => {
                 </div>
             </div>
 
-            {/* Side Bar */}
-            {sidebarOpen && (
-                <aside className="fixed top-[7.5rem] left-0 w-64 h-full bg-white shadow z-20 p-4">
-                    <ul className="space-y-4">
-                        <li className="cursor-pointer hover:bg-gray-100 p-2">Chats</li>
-                        <li className="cursor-pointer hover:bg-gray-100 p-2">Meal Prep</li>
-                        <li className="cursor-pointer hover:bg-gray-100 p-2">Workout Routine</li>
-                        <li className="cursor-pointer hover:bg-gray-100 p-2">Holiday Specials</li>
-                    </ul>
-                </aside>
-            )}
+            {/* Side Bar with Slide Animation */}
+            <aside
+                className={`fixed top-[7.5rem] left-0 w-64 h-full bg-white shadow z-20 p-4 transform transition-transform duration-300 ${
+                    sidebarOpen ? "translate-x-0" : "-translate-x-full"
+                }`}
+            >
+                <ul className="space-y-4">
+                    <li className="cursor-pointer hover:bg-gray-100 p-2">Chats</li>
+                    <li className="cursor-pointer hover:bg-gray-100 p-2">Meal Prep</li>
+                    <li className="cursor-pointer hover:bg-gray-100 p-2">
+                        Workout Routine
+                    </li>
+                    <li className="cursor-pointer hover:bg-gray-100 p-2">
+                        Holiday Specials
+                    </li>
+                </ul>
+            </aside>
 
             {/* Main Content */}
             <main
@@ -118,13 +199,50 @@ const HomePage: React.FC = () => {
                 }`}
             >
                 <div className="flex flex-col items-center justify-center min-h-[calc(100vh-11rem)]">
-                    <h2 className="text-3xl font-semibold mb-6 text-center">
-                        Start Your Fitness Journey Today!
-                    </h2>
+                    {/* Only show the initial heading when there are no chat logs */}
+                    {chatLogs.length === 0 && (
+                        <h2 className="text-3xl font-semibold mb-6 text-center">
+                            Start Your Fitness Journey Today!
+                        </h2>
+                    )}
+
+                    {/* Chat Logs */}
+                    {/* <div className="w-full max-w-md space-y-2 mb-6">
+                        {chatLogs.map((msg, idx) => (
+                            <div
+                                key={idx}
+                                className={`p-2 rounded-lg max-w-[80%] ${
+                                    msg.sender === "user"
+                                        ? "bg-blue-600 text-white self-end ml-auto"
+                                        : "bg-gray-300 text-black self-start mr-auto"
+                                }`}
+                            >
+                                {msg.text}
+                            </div>
+                        ))}
+                    </div> */}
+
+                    {/* Chat Logs */}
+                    <div className="w-full max-w-md mb-6">
+                        {chatLogs.map((msg, idx) => (
+                            <div
+                                key={idx}
+                                className={`rounded-lg max-w-[80%] mb-20 ${
+                                    msg.sender === "user"
+                                        ? "bg-blue-600 text-white self-end ml-28"
+                                        : "bg-gray-300 text-black self-start mr-28"
+                                }`}
+                            >
+                                <p className="p-2">{msg.text}</p>
+                            </div>
+                        ))}
+                    </div>
+
+
                     {/* Chat Input Box */}
                     <form
                         onSubmit={handleChatSubmit}
-                        className="relative w-full max-w-md text-center"
+                        className="relative w-full max-w-md text-center mb-40"
                     >
                         <input
                             type="text"
