@@ -23,26 +23,6 @@ router = APIRouter(
 SECRET_KEY = os.getenv("AUTH_SECRET_KEY")
 ALGORITHM = os.getenv("AUTH_ALGORITHM")
 
-
-class UserRequest(BaseModel):
-    id: int
-    username: str
-    password: str
-    email: EmailStr
-    first_name: str
-    last_name: str
-    age: int
-    gender: Optional[Gender]
-    height_cm: float
-    weight_kg: float
-    activity_level: ActivityLevel = None
-    fitness_goals: list[FitnessGoals] = []
-    exercise_preference: Optional[str] = None
-    diet_preference: Optional[str] = None
-    allergies: Optional[str] = None
-    meal_prep_availability: str = None
-    exercise_availability: str = None
-
 class Config:
     orm_mode: bool = True
 
@@ -75,7 +55,7 @@ def create_access_token(username: str, user_id: int, expires_delta: timedelta):
 # It then creates new user entry in our database with the users username and hashed password
 # Returns an error if username is already registered
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-async def create_new_user(db: db_dependency, create_user_request: UserRequest):
+async def create_new_user(db: db_dependency, create_user_request: User):
     existing_user = db.exec(select(User).where(User.username == create_user_request.username)).first()
     if existing_user:
         raise HTTPException(
@@ -84,7 +64,7 @@ async def create_new_user(db: db_dependency, create_user_request: UserRequest):
         )
     create_user_model = User(
         username=create_user_request.username,
-        hashed_password=bcrpyt_context.hash(create_user_request.password),
+        hashed_password=bcrpyt_context.hash(create_user_request.hashed_password),
         email=create_user_request.email,
         first_name=create_user_request.first_name,
         last_name=create_user_request.last_name,
