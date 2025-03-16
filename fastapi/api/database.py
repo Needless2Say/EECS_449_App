@@ -1,12 +1,16 @@
-from sqlmodel import create_engine, Session, text, delete, SQLModel
+from sqlmodel import create_engine, Session, text, delete, Field, SQLModel
+from sqlalchemy import Column, JSON
 from dotenv import load_dotenv
 import os
 from enum import Enum
-from typing import Optional, Field
+from typing import Optional
 
 
 load_dotenv()
 SQL_ALCHEMY_DATABASE_URL = os.getenv("SQL_ALCHEMY_DATABASE_URL")
+
+
+engine = create_engine(SQL_ALCHEMY_DATABASE_URL, echo=True)
 
 class ActivityLevel(str, Enum):
     SEDENTARY = "Sedentary"
@@ -35,7 +39,7 @@ class User(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     username: str = Field(unique=True, index=True)
     email: str = Field(unique=True, index=True)
-    password_hash: str = Field(unique=True)
+    hashed_password: str = Field(unique=True)
 
     first_name: str
     last_name: str
@@ -44,13 +48,13 @@ class User(SQLModel, table=True):
     height_cm: float
     weight_kg: float
     activity_level: ActivityLevel = None
-    fitness_goals: list[FitnessGoals]
+    fitness_goals: list[FitnessGoals] = Field(default_factory=list, sa_column=Column(JSON))
 
     exercise_preference: Optional[str] = None  # CSV format like "Cardio,Strength Training"
     diet_preference: Optional[str] = None  # CSV format like "Vegan,Keto"
     allergies: Optional[str] = None  # CSV format like "Nuts,Dairy"
 
-    #dark_mode_enabled: Optional[bool] = Field(default=False)
+    # dark_mode_enabled: Optional[bool] = Field(default=False)
 
     meal_prep_availability: str = None  # Example: "Mornings, Weekends"
     exercise_availability: str = None  # Example: "6 AM - 7 AM, 5 PM - 6 PM"
