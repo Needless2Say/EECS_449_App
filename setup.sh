@@ -41,6 +41,8 @@ fi
 # Step 9: Move into caloriq next.js folder and install all packages
 cd caloriq
 npm install
+npm install axios
+npm install bootstrap
 
 # Step 10: Move out back to home directory
 cd ..
