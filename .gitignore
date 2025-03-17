@@ -30,8 +30,8 @@
 /caloriqyarn-error.log*
 /caloriq.pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-/caloriq.env*
+# global env files
+**/.env
 
 # vercel
 /caloriq.vercel

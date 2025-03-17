@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useRef, FormEvent } from "react";
+import React, { useContext, useState, useEffect, useRef, FormEvent } from "react";
 import Image from "next/image";
+import AuthContext from "./context/AuthContext";
 import { useRouter } from "next/navigation";
 
 // define a chat message interface
@@ -11,6 +12,9 @@ interface ChatMessage {
 }
 
 const HomePage: React.FC = () => {
+    // create authentication variable by getting return value from custom context AuthContext
+    const auth = useContext(AuthContext);
+
     // initialize toggles for sidebar and profile menu pop up
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
@@ -87,6 +91,13 @@ const HomePage: React.FC = () => {
     };
 
 
+    // function to login user
+    const handleLogin = () => {
+        setProfileMenuOpen(false);
+        router.push("/login");
+    };
+
+
     // function to logout user
     const handleLogout = () => {
         console.log("Logging out...");
@@ -94,7 +105,7 @@ const HomePage: React.FC = () => {
     };
 
 
-    // function to handle new chat (clear chat logs and reset home screen)
+    // function to create new chat (clear chat logs and reset home screen)
     const handleNewChat = () => {
         setChatLogs([]);
         // optionally reset the chatMessage too
@@ -152,16 +163,89 @@ const HomePage: React.FC = () => {
                     </button>
 
                     {/* Profile Menu with rounded corners */}
+                    {/* {profileMenuOpen && (
+                        <div
+                            ref={profileMenuRef}
+                            className="absolute top-10 right-0 w-40 bg-white border shadow-md z-10 rounded-lg"
+                        >
+                            <ul className="flex flex-col">
+                                {auth?.user ? (
+                                    // Show these options when user is logged in
+                                    <>
+                                        <li 
+                                            className="p-2 hover:bg-gray-100 cursor-pointer"
+                                            // onClick={}
+                                        >
+                                            Profile
+                                        </li>
+                                        <li 
+                                            className="p-2 hover:bg-gray-100 cursor-pointer"
+                                            // onClick={}
+                                        >
+                                            Settings
+                                        </li>
+                                        <li 
+                                            className="p-2 hover:bg-gray-100 cursor-pointer"
+                                            onClick={() => router.push("/meal")}
+                                        >
+                                            Meal Plan
+                                        </li>
+                                        <li
+                                            className="p-2 hover:bg-gray-100 cursor-pointer"
+                                            onClick={() => router.push("/workout")}
+                                        >
+                                            Workout Plan
+                                        </li>
+                                        <li
+                                            className="p-2 hover:bg-gray-100 cursor-pointer"
+                                            onClick={handleLogout}
+                                        >
+                                            Logout
+                                        </li>
+                                    </>
+                                ) : (
+                                    // Show login option when user is not logged in
+                                    <li
+                                        className="p-2 hover:bg-gray-100 cursor-pointer"
+                                        onClick={handleLogin}
+                                    >
+                                        Login
+                                    </li>
+                                )}
+                            </ul>
+                        </div>
+                    )} */}
+
                     {profileMenuOpen && (
                         <div
                             ref={profileMenuRef}
                             className="absolute top-10 right-0 w-40 bg-white border shadow-md z-10 rounded-lg"
                         >
                             <ul className="flex flex-col">
-                                <li className="p-2 hover:bg-gray-100 cursor-pointer">Profile</li>
-                                <li className="p-2 hover:bg-gray-100 cursor-pointer">Settings</li>
-                                <li className="p-2 hover:bg-gray-100 cursor-pointer">Meal Plan</li>
-                                <li className="p-2 hover:bg-gray-100 cursor-pointer">Workout Plan</li>
+                                <li 
+                                    className="p-2 hover:bg-gray-100 cursor-pointer"
+                                    // onClick={}
+                                >
+                                    Profile
+                                </li>
+                                <li 
+                                    className="p-2 hover:bg-gray-100 cursor-pointer"
+                                    // onClick={}
+                                >
+                                    Settings
+                                </li>
+                                <li 
+                                    className="p-2 hover:bg-gray-100 cursor-pointer"
+                                    onClick={() => router.push("/meal")}
+                                >
+                                    Meal Plan
+                                </li>
+                                <li
+                                    className="p-2 hover:bg-gray-100 cursor-pointer"
+                                    onClick={() => router.push("/workout")}
+                                >
+                                    Workout Plan
+                                </li>
                                 <li
                                     className="p-2 hover:bg-gray-100 cursor-pointer"
                                     onClick={handleLogout}
@@ -176,18 +260,17 @@ const HomePage: React.FC = () => {
 
             {/* Side Bar with Slide Animation */}
             <aside
-                className={`fixed top-[7.5rem] left-0 w-64 h-full bg-white shadow z-20 p-4 transform transition-transform duration-300 ${
+                className={`fixed top-[8.7rem] left-0 w-64 h-full bg-white shadow z-20 p-4 transform transition-transform duration-300 ${
                     sidebarOpen ? "translate-x-0" : "-translate-x-full"
                 }`}
             >
                 <ul className="space-y-4">
                     <li className="cursor-pointer hover:bg-gray-100 p-2">Chats</li>
-                    <li className="cursor-pointer hover:bg-gray-100 p-2">Meal Prep</li>
-                    <li className="cursor-pointer hover:bg-gray-100 p-2">
-                        Workout Routine
+                    <li className="cursor-pointer hover:bg-gray-100 p-2" onClick={() => router.push("/meal")}>
+                        Meal Prep
                     </li>
-                    <li className="cursor-pointer hover:bg-gray-100 p-2">
-                        Holiday Specials
+                    <li className="cursor-pointer hover:bg-gray-100 p-2" onClick={() => router.push("/workout")}>
+                        Workout Routine
                     </li>
                 </ul>
             </aside>
