@@ -41,13 +41,11 @@ class User(SQLModel, table=True):
     email: str = Field(unique=True, index=True)
     hashed_password: str = Field(unique=True)
 
-    first_name: str
-    last_name: str
-    age: int
+    age: Optional[int]
     gender: Optional[Gender] = Field(default=None)
-    height_cm: float
-    weight_kg: float
-    activity_level: ActivityLevel = None
+    height_cm: Optional[float]
+    weight_kg: Optional[float]
+    activity_level: Optional[ActivityLevel] = None
     fitness_goals: list[FitnessGoals] = Field(default_factory=list, sa_column=Column(JSON))
 
     exercise_preference: Optional[str] = None  # CSV format like "Cardio,Strength Training"
@@ -56,8 +54,8 @@ class User(SQLModel, table=True):
 
     # dark_mode_enabled: Optional[bool] = Field(default=False)
 
-    meal_prep_availability: str = None  # Example: "Mornings, Weekends"
-    exercise_availability: str = None  # Example: "6 AM - 7 AM, 5 PM - 6 PM"
+    meal_prep_availability: Optional[str] = None  # Example: "Mornings, Weekends"
+    exercise_availability: Optional[str] = None  # Example: "6 AM - 7 AM, 5 PM - 6 PM"
 
 
 # Separate table for detailed availability
