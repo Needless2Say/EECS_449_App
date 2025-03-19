@@ -58,12 +58,12 @@ const SignUpPage: React.FC = () => {
 
         // try following lines of code
         // try {
-        //     await axios.post("http://localhost:8000/auth", {
+        //     await axios.post("http://localhost:8000/auth/register", {
         //         username,
         //         password,
         //         email
         //     });
-            
+
         //     // login user after successful registration
         //     await auth.login(username, password);
             
