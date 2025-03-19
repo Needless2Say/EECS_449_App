@@ -119,7 +119,12 @@ const HomePage: React.FC = () => {
             <header className="w-full bg-white shadow flex items-center justify-between px-4 py-3">
                 {/* Apple Image */}
                 <div>
-                    <Image src="/apple.png" alt="Apple" width={40} height={40} />
+                    <Image 
+                        src="/apple.png"
+                        alt="Apple" 
+                        width={40} 
+                        height={40}
+                    />
                 </div>
 
                 {/* Enlarged CaloriQ Title */}
@@ -127,7 +132,13 @@ const HomePage: React.FC = () => {
 
                 {/* Broccoli Image */}
                 <div>
-                    <Image src="/broccoli.png" alt="Broccoli" width={40} height={40} />
+                    <Image
+                    // <a href="https://www.flaticon.com/free-icons/fruit" title="fruit icons">Fruit icons created by Freepik - Flaticon</a>
+                        src="/broccoli.png"
+                        alt="Broccoli"
+                        width={40}
+                        height={40}
+                    />
                 </div>
             </header>
 
@@ -163,7 +174,7 @@ const HomePage: React.FC = () => {
                     </button>
 
                     {/* Profile Menu with rounded corners */}
-                    {/* {profileMenuOpen && (
+                    {profileMenuOpen && (
                         <div
                             ref={profileMenuRef}
                             className="absolute top-10 right-0 w-40 bg-white border shadow-md z-10 rounded-lg"
@@ -214,46 +225,6 @@ const HomePage: React.FC = () => {
                                 )}
                             </ul>
                         </div>
-                    )} */}
-
-                    {profileMenuOpen && (
-                        <div
-                            ref={profileMenuRef}
-                            className="absolute top-10 right-0 w-40 bg-white border shadow-md z-10 rounded-lg"
-                        >
-                            <ul className="flex flex-col">
-                                <li 
-                                    className="p-2 hover:bg-gray-100 cursor-pointer"
-                                    // onClick={}
-                                >
-                                    Profile
-                                </li>
-                                <li 
-                                    className="p-2 hover:bg-gray-100 cursor-pointer"
-                                    // onClick={}
-                                >
-                                    Settings
-                                </li>
-                                <li 
-                                    className="p-2 hover:bg-gray-100 cursor-pointer"
-                                    onClick={() => router.push("/meal")}
-                                >
-                                    Meal Plan
-                                </li>
-                                <li
-                                    className="p-2 hover:bg-gray-100 cursor-pointer"
-                                    onClick={() => router.push("/workout")}
-                                >
-                                    Workout Plan
-                                </li>
-                                <li
-                                    className="p-2 hover:bg-gray-100 cursor-pointer"
-                                    onClick={handleLogout}
-                                >
-                                    Logout
-                                </li>
-                            </ul>
-                        </div>
                     )}
                 </div>
             </div>
@@ -265,7 +236,6 @@ const HomePage: React.FC = () => {
                 }`}
             >
                 <ul className="space-y-4">
-                    <li className="cursor-pointer hover:bg-gray-100 p-2">Chats</li>
                     <li className="cursor-pointer hover:bg-gray-100 p-2" onClick={() => router.push("/meal")}>
                         Meal Prep
                     </li>
