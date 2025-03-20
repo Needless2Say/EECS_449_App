@@ -66,8 +66,6 @@ async def create_new_user(db: db_dependency, create_user_request: User):
         username=create_user_request.username,
         hashed_password=bcrpyt_context.hash(create_user_request.hashed_password),
         email=create_user_request.email,
-        first_name=create_user_request.first_name,
-        last_name=create_user_request.last_name,
         age=create_user_request.age,
         gender=create_user_request.gender,
         height_cm=create_user_request.height_cm,
