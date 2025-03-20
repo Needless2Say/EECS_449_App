@@ -36,10 +36,10 @@ class FitnessGoals(str, Enum):
 
 
 class User(SQLModel, table=True):
-    id: int = Field(default=None, primary_key=True)
+    id: int = Field(primary_key=True, sa_column_kwargs={"autoincrement": True})
     username: str = Field(unique=True, index=True)
     email: str = Field(unique=True, index=True)
-    hashed_password: str = Field(unique=True)
+    password: str = Field(unique=True)
 
     age: Optional[int]
     gender: Optional[Gender] = Field(default=None)

@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import Annotated
 from sqlmodel import Session
 from .routers import auth
+from .routers import user
 from api.database import Base, engine
 
 # import custom routers
@@ -27,6 +28,8 @@ Base.metadata.create_all(bind=engine)
 origins = [
     "http://localhost:3000",
     "https://localhost:3000",
+    "http://localhost:3001",
+    "https://localhost:3001",
 ]
 
 
@@ -37,6 +40,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"]
 )
 
 
@@ -48,7 +52,7 @@ def health_check():
     return 'Health check complete'
 
 app.include_router(auth.router)
-
+app.include_router(user.router)
 
 # get all routes for each website
 # app.include_router(auth_routes.router) # authentication routes

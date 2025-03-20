@@ -34,3 +34,5 @@ passlib[bcrypt]
 python-multipart
 pyjwt
 python-dotenv
+ollama
+requests
