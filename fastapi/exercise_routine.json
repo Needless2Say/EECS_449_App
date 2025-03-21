@@ -3,154 +3,88 @@
         {
             "sets": 3,
             "reps": 12,
-            "exercise": "push-up"
-        },
-        {
-            "sets": 3,
-            "reps": 10,
-            "exercise": "dumbbell bench press"
+            "exercise": "push-ups"
         },
         {
             "sets": 3,
             "reps": 12,
-            "exercise": "dumbbell fly"
+            "exercise": "bodyweight squats"
         },
         {
             "sets": 3,
-            "reps": 15,
+            "reps": 12,
+            "exercise": "bent-over dumbbell rows"
+        },
+        {
+            "sets": 3,
+            "reps": 12,
             "exercise": "plank  "
-        }
-    ],
-    "Tuesday": [
-        {
-            "sets": 3,
-            "reps": 12,
-            "exercise": "bodyweight squat"
-        },
-        {
-            "sets": 3,
-            "reps": 10,
-            "exercise": "dumbbell lunges"
-        },
-        {
-            "sets": 3,
-            "reps": 12,
-            "exercise": "glute bridge"
-        },
-        {
-            "sets": 3,
-            "reps": 15,
-            "exercise": "side plank  "
         }
     ],
     "Wednesday": [
         {
             "sets": 3,
             "reps": 12,
-            "exercise": "bent-over dumbbell row"
+            "exercise": "dumbbell bench press"
         },
         {
             "sets": 3,
-            "reps": 10,
+            "reps": 12,
+            "exercise": "dumbbell lunges"
+        },
+        {
+            "sets": 3,
+            "reps": 12,
             "exercise": "lat pulldown"
         },
         {
             "sets": 3,
             "reps": 12,
-            "exercise": "dumbbell bicep curl"
-        },
-        {
-            "sets": 3,
-            "reps": 15,
-            "exercise": "wrist curl  "
-        }
-    ],
-    "Thursday": [
-        {
-            "sets": 3,
-            "reps": 12,
-            "exercise": "push-up"
-        },
-        {
-            "sets": 3,
-            "reps": 10,
-            "exercise": "dumbbell shoulder press"
-        },
-        {
-            "sets": 3,
-            "reps": 12,
-            "exercise": "lateral raise"
-        },
-        {
-            "sets": 3,
-            "reps": 15,
-            "exercise": "plank  "
+            "exercise": "Russian twists  "
         }
     ],
     "Friday": [
         {
             "sets": 3,
             "reps": 12,
-            "exercise": "bodyweight squat"
-        },
-        {
-            "sets": 3,
-            "reps": 10,
-            "exercise": "dumbbell deadlift"
+            "exercise": "incline dumbbell press"
         },
         {
             "sets": 3,
             "reps": 12,
-            "exercise": "step-up"
+            "exercise": "leg press"
         },
         {
             "sets": 3,
-            "reps": 15,
+            "reps": 12,
+            "exercise": "dumbbell shoulder press"
+        },
+        {
+            "sets": 3,
+            "reps": 12,
             "exercise": "side plank  "
-        }
-    ],
-    "Saturday": [
-        {
-            "sets": 3,
-            "reps": 12,
-            "exercise": "bent-over dumbbell row"
-        },
-        {
-            "sets": 3,
-            "reps": 10,
-            "exercise": "dumbbell triceps extension"
-        },
-        {
-            "sets": 3,
-            "reps": 12,
-            "exercise": "dumbbell hammer curl"
-        },
-        {
-            "sets": 3,
-            "reps": 15,
-            "exercise": "wrist curl  "
         }
     ],
     "Sunday": [
         {
             "sets": 3,
             "reps": 12,
-            "exercise": "push-up"
-        },
-        {
-            "sets": 3,
-            "reps": 10,
-            "exercise": "dumbbell bench press"
+            "exercise": "chest dips"
         },
         {
             "sets": 3,
             "reps": 12,
-            "exercise": "dumbbell fly"
+            "exercise": "deadlifts"
         },
         {
             "sets": 3,
-            "reps": 15,
-            "exercise": "plank"
+            "reps": 12,
+            "exercise": "barbell curls"
+        },
+        {
+            "sets": 3,
+            "reps": 12,
+            "exercise": "crunches"
         }
     ]
 }
