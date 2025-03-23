@@ -3,8 +3,7 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from alembic import context
-from api.database import User, UserAvailability
-from api.database import SQLModel
+from sqlmodel import SQLModel
 from dotenv import load_dotenv
 import os
 
@@ -13,8 +12,8 @@ load_dotenv()
 SQL_ALCHEMY_DATABASE_URL = os.getenv("SQL_ALCHEMY_DATABASE_URL")
 
 
-# import all models from models.py
-from api.models import *
+# import all models from database.py
+from api.database import *
 
 
 # this is the Alembic Config object, which provides

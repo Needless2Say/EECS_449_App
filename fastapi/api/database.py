@@ -78,14 +78,16 @@ class User(SQLModel, table=True):
     id: int = Field(primary_key=True, sa_column_kwargs={"autoincrement": True})
     username: str = Field(unique=True, index=True)
     email: str = Field(unique=True, index=True)
-    hashed_password: str = Field(unique=True)
+    password: str = Field(unique=True)
 
     age: Optional[int]
-    gender: Optional[list[Gender]] = Field(default_factory=list, sa_column=Column(JSON))  # Changed to List[Gender]    
+
+    gender: Optional[Gender] = Field(default=None)
     height_cm: Optional[float]
     weight_kg: Optional[float]
-    activity_level: Optional[list[ActivityLevel]] = Field(default_factory=list, sa_column=Column(JSON))  # Changed to List[ActivityLevel]
+    activity_level: Optional[ActivityLevel] = None
     fitness_goals: Optional[list[FitnessGoals]] = Field(default_factory=list, sa_column=Column(JSON))
+
 
     exercise_preferences: Optional[list[ExercisePreferences]] = Field(default_factory=list, sa_column=Column(JSON))  # Updated field
     diet_preference: Optional[str] = None  # CSV format like "Vegan,Keto"

@@ -39,7 +39,7 @@ def auth_user(username: str, password: str, db):
     user = db.exec(select(User).where(User.username == username)).first()
     if not user:
         return False
-    if not bcrpyt_context.verify(password, user.hashed_password):
+    if not bcrpyt_context.verify(password, user.password):
         return False
     return user
 
@@ -55,45 +55,55 @@ def create_access_token(username: str, user_id: int, expires_delta: timedelta):
 # It then creates new user entry in our database with the users username and hashed password
 # Returns an error if username is already registered
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-async def create_new_user(db: db_dependency, create_user_request: User):
-    existing_user = db.exec(select(User).where(User.username == create_user_request.username)).first()
+async def create_new_user(db: db_dependency, user: User):
+    print("\n")
+    print(f"USER INFO: {user}")
+    print("\n")
+    existing_user = db.exec(select(User).where(User.username == user.username)).first()
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username already registered"
         )
-    create_user_model = User(
-        username=create_user_request.username,
-        hashed_password=bcrpyt_context.hash(create_user_request.hashed_password),
-        email=create_user_request.email,
-        first_name=create_user_request.first_name,
-        last_name=create_user_request.last_name,
-        age=create_user_request.age,
-        gender=create_user_request.gender,
-        height_cm=create_user_request.height_cm,
-        weight_kg=create_user_request.weight_kg,
-        activity_level=create_user_request.activity_level,
-        fitness_goals=create_user_request.fitness_goals,
-        exercise_preference=create_user_request.exercise_preference,
-        diet_preference=create_user_request.diet_preference,
-        allergies=create_user_request.allergies,
-        meal_prep_availability=create_user_request.meal_prep_availability,
-        exercise_availability=create_user_request.exercise_availability
+
+    new_user = User(
+        username=user.username,
+        password=bcrpyt_context.hash(user.password),
+        email=user.email,
     )
-    db.add(create_user_model)
-    db.commit()
+
+    try:
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+        print("\n")
+        print("IT WORKED")
+        print("\n")
+        return {"message": "User created successfully"}
+    except Exception as e:
+        print("\n")
+        print(f"ERROR INFO: {e}")
+        print("\n")
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error creating user: {str(e)}"
+        )
 
 # Receives login credentials and calls auth_user to verify with values in our db
 # Generates token if successful using create_access_token
 # Returns token
 @router.post('/token', response_model=Token)
-async def access_token_login(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency):
+async def access_token_login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency):
+    print(f"Login attempt - Username: {form_data.username}, Password: {form_data.password}")
     user = auth_user(form_data.username, form_data.password, db)
     if not user:
+        print("Authentication failed for user:", form_data.username)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Problem Validating User"
         )
+
+    print("Authentication successful for user:", user.username)
     token = create_access_token(user.username, user.id, timedelta(minutes=10))
     return {'access_token': token, 'token_type': 'bearer'} 

@@ -1,12 +1,10 @@
 "use client";
 
-
 import React, { useContext, useState, FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import axios from "axios";
 import AuthContext from "../context/AuthContext";
-
 
 
 const LoginPage: React.FC = () => {
@@ -38,76 +36,64 @@ const LoginPage: React.FC = () => {
     };
 
 
-    // async handle register user function that registers new user
-    // e is a typed form event from HTML form and returns a promise that resolves to void
-    const handleRegister = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
-        // prevent default form submission behavior (normally reloads page)
-        e.preventDefault();
-
-        // try following lines of code
-        try {
-            // send POST request to route with new user's username and password in request payload
-            const response = await axios.post("http://localhost:8000/auth", {
-                username: username,
-                password: password,
-            });
-
-            // call login function to login user after new user's credentials have been saved in the database
-            login(username, password);
-
-        } catch (error) { // catch any errors
-            // return error message
-            console.error("Failed to register user:", error);
-        }
-    };
+    
 
 
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4 text-black">
-            {/* Sign In */}
+            {/* Login In Card */}
             <div className="w-full max-w-md bg-white rounded shadow p-6">
                 <h2 className="text-2xl font-bold mb-4 text-center">
                     Login
                 </h2>
 
-                {/* Email Address Field */}
-                <label htmlFor="email" className="block mb-1 font-medium">
-                    Email Address
-                </label>
-                <input
-                    type="email"
-                    id="email"
-                    placeholder="Enter your email"
-                    className="border rounded w-full p-2 mb-4"
-                />
+                {/* Username Field */}
+                <form onSubmit={handleLogin}>
+                    <label htmlFor="username" className="block mb-1 font-medium">
+                        Username <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                        type="username"
+                        id="username"
+                        placeholder="Enter your username..."
+                        className="border rounded w-full p-2 mb-4"
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
 
-                {/* Password Address Field */}
-                <label htmlFor="password" className="block mb-1 font-medium">
-                    Password
-                </label>
-                <input
-                    type="password"
-                    id="password"
-                    placeholder="Enter your password"
-                    className="border rounded w-full p-2 mb-4"
-                />
+                    {/* Password Field */}
+                    <label htmlFor="password" className="block mb-1 font-medium">
+                        Password <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Enter your password..."
+                        className="border rounded w-full p-2 mb-4"
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
 
-                {/* Login Button */}
-                <button className="bg-blue-600 text-white w-full p-2 rounded mb-2 hover:bg-blue-700">
-                    Login
-                </button>
+                    {/* Login Button */}
+                    <button
+                        type="submit"
+                        className="bg-blue-600 text-white w-full p-2 rounded mb-6 hover:bg-blue-700 text-lg"
+                    >
+                        Login
+                    </button>
 
-                {/* Sign Up Link */}
-                <p className="text-sm text-center">
-                    Don&apos;t have an account?{" "}
-                    <Link href="/signup" className="text-blue-600 underline">
-                        Sign Up!
-                    </Link>
-                </p>
+                    {/* Sign Up Link */}
+                    <p className="text-m text-center">
+                        Don&apos;t have an account?{" "}
+                        <Link href="/signup" className="text-blue-600 underline">
+                            Sign Up!
+                        </Link>
+                    </p>
+                </form>
             </div>
 
+
             {/* Horizontal Divider */}
-            <hr className="w-full max-w-md my-6 border-t-2 border-gray-300" />
+            <hr className="w-full max-w-md my-6 border-t-2 border-black" />
+
 
             {/* Lower Section: Create Account (Social Logins) */}
             <div className="w-full max-w-md bg-white rounded shadow p-6">
