@@ -15,28 +15,35 @@ import json
 # Add all the table names here
 from database import User
 
-#from database import engine
-#SQLModel.metadata.create_all(engine)
-#engine = create_engine('sqlite:///orm.db', echo=True)
+# .env variables
+from dotenv import load_dotenv
 
-engine = create_engine('sqlite:///orm.db')
-
-# REMOVE API KEY BEFORE PUSHING TO GIT
-API_KEY = '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'
-API_URL = 'https://openrouter.ai/api/v1/chat/completions'
+# from database import engine
+# SQLModel.metadata.create_all(engine)
+# engine = create_engine('sqlite:///orm.db', echo=True)
+engine = create_engine("sqlite:///orm.db")
 
 
-# Define the headers for the API request
+# load environment variables from .env file
+load_dotenv()
+
+# get API key and url from .env file
+API_KEY = os.getenv("API_KEY")
+API_URL = os.getenv("API_URL")
+
+
+# define the headers for the API request
 headers = {
     'Authorization': f'Bearer {API_KEY}',
     'Content-Type': 'application/json'
 }
 
+
 def create_meal_plan(User_Name):
     user_context = ''
     
     with Session(engine) as session:
-        # Query the user by ID
+        # query the user by ID
         statement = select(User).where(User.username == User_Name)
 
         user = session.exec(statement).first()
@@ -68,7 +75,7 @@ def create_meal_plan(User_Name):
         }]
     }
 
-    # Send the POST request to the DeepSeek API
+    # send the POST request to the DeepSeek API
     response = requests.post(API_URL, json=data, headers=headers)
 
     response_json = response.json()
@@ -111,12 +118,13 @@ def create_exercise_routine(User_Name):
         }]
     }
     
-    # Send the POST request to the DeepSeek API
+    # send the POST request to the DeepSeek API
     response = requests.post(API_URL, json=data, headers=headers)
     
     response_json = response.json()
     assistant_content = response_json['choices'][0]['message']['content']
     return assistant_content
+
 
 def parse_meal_plan_to_dict(meal_plan_text):
     """
@@ -137,6 +145,7 @@ def parse_meal_plan_to_dict(meal_plan_text):
             "dinner": dinner
         }
     return meal_plan_dict
+
 
 def parse_exercise_routine_to_dict(exercise_routine_text):
     """
@@ -165,6 +174,7 @@ def parse_exercise_routine_to_dict(exercise_routine_text):
                 })
         exercise_routine_dict[day] = exercises
     return exercise_routine_dict
+
 
 def save_to_json(data_dict, filename):
     """

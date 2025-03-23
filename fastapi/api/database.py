@@ -1,7 +1,7 @@
 from sqlmodel import SQLModel, Field, create_engine, Session, Column, select, delete
 from sqlalchemy import JSON
 from enum import Enum
-from typing import Optional, List
+from typing import Optional
 import requests
 import datetime
 import os
@@ -80,19 +80,17 @@ class User(SQLModel, table=True):
     email: str = Field(unique=True, index=True)
     hashed_password: str = Field(unique=True)
 
-    first_name: str
-    last_name: str
-    age: int
-    gender: List[Gender] = Field(default_factory=list, sa_column=Column(JSON))  # Changed to List[Gender]    
-    height_cm: float
-    weight_kg: float
-    activity_level: List[ActivityLevel] = Field(default_factory=list, sa_column=Column(JSON))  # Changed to List[ActivityLevel]
-    fitness_goals: List[FitnessGoals] = Field(default_factory=list, sa_column=Column(JSON))
+    age: Optional[int]
+    gender: Optional[list[Gender]] = Field(default_factory=list, sa_column=Column(JSON))  # Changed to List[Gender]    
+    height_cm: Optional[float]
+    weight_kg: Optional[float]
+    activity_level: Optional[list[ActivityLevel]] = Field(default_factory=list, sa_column=Column(JSON))  # Changed to List[ActivityLevel]
+    fitness_goals: Optional[list[FitnessGoals]] = Field(default_factory=list, sa_column=Column(JSON))
 
-    exercise_preferences: List[ExercisePreferences] = Field(default_factory=list, sa_column=Column(JSON))  # Updated field
+    exercise_preferences: Optional[list[ExercisePreferences]] = Field(default_factory=list, sa_column=Column(JSON))  # Updated field
     diet_preference: Optional[str] = None  # CSV format like "Vegan,Keto"
     allergies: Optional[str] = None  # CSV format like "Nuts,Dairy"
-    exercise_availability: List[DayOfWeek] = Field(default_factory=list, sa_column=Column(JSON))
+    exercise_availability: Optional[list[DayOfWeek]] = Field(default_factory=list, sa_column=Column(JSON))
 
 
 # Create all tables
