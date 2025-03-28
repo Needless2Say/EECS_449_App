@@ -7,34 +7,11 @@ import datetime
 import os
 
 
-# load_dotenv()
-#SQL_ALCHEMY_DATABASE_URL = os.getenv("SQL_ALCHEMY_DATABASE_URL")
-#engine = create_engine(SQL_ALCHEMY_DATABASE_URL, echo=True)
-
-# Use SQLite database
 if os.path.exists("orm.db"):
     os.remove("orm.db")
 
 engine = create_engine('sqlite:///orm.db', echo=True)
 
-# def get_engine():
-#     """
-#     Get Engine To Database
-#     """
-#     return create_engine(SQL_ALCHEMY_DATABASE_URL, echo=True)
-
-
-# def get_session():
-#     """
-#     Get Connection and Create Session to Database
-#     """
-#     engine = get_engine()
-#     return Session(engine)
-
-
-#Base = SQLModel  
-
-# Enums for activity level, gender, and fitness goals
 class ActivityLevel(str, Enum):
     SEDENTARY = "Sedentary"
     LIGHTLY_ACTIVE = "Lightly Active"
@@ -73,26 +50,32 @@ class DayOfWeek(str, Enum):
     SUNDAY = "Sunday"
     
 
-# User model
 class User(SQLModel, table=True):
     id: int = Field(primary_key=True, sa_column_kwargs={"autoincrement": True})
     username: str = Field(unique=True, index=True)
     email: str = Field(unique=True, index=True)
-    password: str = Field(unique=True)
-
+    hashed_password: str = Field(unique=True)
+    first_name: str 
+    last_name: str
     age: Optional[int]
-
-    gender: Optional[Gender] = Field(default=None)
+    gender: Optional[Gender] = Field(default=None, sa_column=Column(JSON))
     height_cm: Optional[float]
     weight_kg: Optional[float]
-    activity_level: Optional[ActivityLevel] = None
+    
+    activity_level: Optional[ActivityLevel] = Field(default=None, sa_column=Column(JSON))
     fitness_goals: Optional[list[FitnessGoals]] = Field(default_factory=list, sa_column=Column(JSON))
-
-
     exercise_preferences: Optional[list[ExercisePreferences]] = Field(default_factory=list, sa_column=Column(JSON))  # Updated field
     diet_preference: Optional[str] = None  # CSV format like "Vegan,Keto"
-    allergies: Optional[str] = None  # CSV format like "Nuts,Dairy"
+    allergies: Optional[str] = None  # CS2V format like "Nuts,Dairy"
     exercise_availability: Optional[list[DayOfWeek]] = Field(default_factory=list, sa_column=Column(JSON))
+
+    # meal preferences
+    liked_meals: Optional[list[str]] = Field(default_factory=list, sa_column=Column(JSON))
+    disliked_meals: Optional[list[str]] = Field(default_factory=list, sa_column=Column(JSON))
+    
+    # workout preferences
+    liked_workouts: Optional[list[str]] = Field(default_factory=list, sa_column=Column(JSON))
+    disliked_workouts: Optional[list[str]] = Field(default_factory=list, sa_column=Column(JSON))
 
 
 # Create all tables
@@ -120,14 +103,14 @@ with Session(engine) as session:
         exercise_preferences=[ExercisePreferences.CARDIO, ExercisePreferences.STRENGTH_TRAINING],
         diet_preference="Vegan",
         allergies="Nuts",
-        exercise_availability=[DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY, DayOfWeek.SUNDAY]
+        exercise_availability=[DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY, DayOfWeek.SUNDAY],
     )
 
     # Add and commit the user
     session.add(user)
     session.commit()
 
-#for testing
+# for testing
 def print_user_info(): 
     # Create a session
     with Session(engine) as session:
@@ -158,9 +141,13 @@ def print_user_info():
             print(f"Diet Preference: {user.diet_preference}")
             print(f"Allergies: {user.allergies}")
             print(f"Exercise Availability: {', '.join(user.exercise_availability)}")
+            print(f"Liked Meals: {', '.join(user.liked_meals)}")
+            print(f"Disiked Meals: {', '.join(user.disliked_meals)}")
+            print(f"Liked Workouts: {', '.join(user.liked_workouts)}")
+            print(f"Disliked Workouts: {', '.join(user.disliked_workouts)}")
             print("------------------------")
             
 # Call the function to print user information (for testing)
-#print_user_info()
+print_user_info()
 
 
