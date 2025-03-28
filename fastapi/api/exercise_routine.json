@@ -1,0 +1,90 @@
+{
+    "Monday": [
+        {
+            "sets": 3,
+            "reps": 12,
+            "exercise": "bicep curl"
+        },
+        {
+            "sets": 3,
+            "reps": 10,
+            "exercise": "triceps extension"
+        },
+        {
+            "sets": 4,
+            "reps": 15,
+            "exercise": "dumbbell shoulder press"
+        },
+        {
+            "sets": 3,
+            "reps": 12,
+            "exercise": "dumbbell lateral raise"
+        }
+    ],
+    "Wednesday": [
+        {
+            "sets": 3,
+            "reps": 12,
+            "exercise": "dumbbell chest press"
+        },
+        {
+            "sets": 3,
+            "reps": 10,
+            "exercise": "bent-over row"
+        },
+        {
+            "sets": 4,
+            "reps": 15,
+            "exercise": "dumbbell hammer curl"
+        },
+        {
+            "sets": 3,
+            "reps": 12,
+            "exercise": "dumbbell shrug"
+        }
+    ],
+    "Friday": [
+        {
+            "sets": 3,
+            "reps": 12,
+            "exercise": "dumbbell bicep curl"
+        },
+        {
+            "sets": 3,
+            "reps": 10,
+            "exercise": "overhead triceps extension"
+        },
+        {
+            "sets": 4,
+            "reps": 15,
+            "exercise": "dumbbell front raise"
+        },
+        {
+            "sets": 3,
+            "reps": 12,
+            "exercise": "dumbbell arnold press"
+        }
+    ],
+    "Sunday": [
+        {
+            "sets": 3,
+            "reps": 12,
+            "exercise": "dumbbell deadlift"
+        },
+        {
+            "sets": 3,
+            "reps": 10,
+            "exercise": "dumbbell squat"
+        },
+        {
+            "sets": 4,
+            "reps": 15,
+            "exercise": "dumbbell calf raise"
+        },
+        {
+            "sets": 3,
+            "reps": 12,
+            "exercise": "dumbbell goblet squat"
+        }
+    ]
+}

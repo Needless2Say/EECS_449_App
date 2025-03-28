@@ -1,0 +1,37 @@
+{
+    "Monday": {
+        "breakfast": "oatmeal with berries and almond butter",
+        "lunch": "lentil curry with brown rice",
+        "dinner": "quinoa stir-fry with tofu and vegetables  "
+    },
+    "Tuesday": {
+        "breakfast": "chia pudding with coconut milk and fruit",
+        "lunch": "chickpea salad with spinach and tahini dressing",
+        "dinner": "black bean and sweet potato tacos  "
+    },
+    "Wednesday": {
+        "breakfast": "smoothie with spinach, banana, and plant-based protein powder",
+        "lunch": "red lentil soup with whole grain bread",
+        "dinner": "veggie stir-fry with tempeh and quinoa  "
+    },
+    "Thursday": {
+        "breakfast": "tofu scramble with vegetables",
+        "lunch": "quinoa and black bean bowl with avocado",
+        "dinner": "roasted vegetable and lentil stew  "
+    },
+    "Friday": {
+        "breakfast": "whole grain toast with avocado and hummus",
+        "lunch": "chickpea and vegetable curry with basmati rice",
+        "dinner": "vegan chili with mixed beans and quinoa  "
+    },
+    "Saturday": {
+        "breakfast": "berry smoothie with flaxseeds and oats",
+        "lunch": "buddha bowl with roasted veggies and tahini dressing",
+        "dinner": "stir-fried tofu with broccoli and brown rice  "
+    },
+    "Sunday": {
+        "breakfast": "oatmeal with sliced banana and flaxseeds",
+        "lunch": "spiced lentil and vegetable soup",
+        "dinner": "grilled portobello mushrooms with quinoa and kale salad"
+    }
+}
