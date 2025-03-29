@@ -77,7 +77,7 @@ async def get_data(db: db_dependency, request: Request):
     user.fitness_goals = [FitnessGoals(item) for item in user_data.get("fitnessGoals", [])] or user.fitness_goals
     user.meal_prep_availability = [DayOfWeek(item) for item in user_data.get("mealPrepAvailability", [])] or user.meal_prep_availability
     user.exercise_availability = [DayOfWeek(item) for item in user_data.get("exerciseAvailability", [])] or user.exercise_availability
-    
+
     db.commit()
     db.refresh(user)
 
@@ -89,7 +89,7 @@ async def gen_meal_plan(db: db_dependency, request: Request):
     user = get_user(db, request)
     
     try:
-        raw_meal_plan = create_meal_plan()
+        raw_meal_plan = create_meal_plan(user.id)
         meal_plan_dict = parse_meal_plan_to_dict(raw_meal_plan)
         return {"meal_plan": meal_plan_dict} #unclear whether i should store meal plans in user db or return to front end, we decided to do did latter
     except Exception as e:
@@ -101,7 +101,7 @@ async def gen_workout_plan(db: db_dependency, request: Request):
     user = get_user(db, request)
 
     try:
-        raw_exercise_plan = create_exercise_routine()
+        raw_exercise_plan = create_exercise_routine(user.id)
         exercise_plan_dict = parse_exercise_routine_to_dict(raw_exercise_plan)
         return {"excercise_plan": exercise_plan_dict} #unclear whether i should store exercise plans in user db or return to front end, we decided to do latter
     except Exception as e:
