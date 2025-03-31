@@ -48,39 +48,46 @@ const LoginPage: React.FC = () => {
                 </h2>
 
                 {/* Username Field */}
-                <label htmlFor="username" className="block mb-1 font-medium">
-                    Username <span className="text-red-500">*</span>
-                </label>
-                <input
-                    type="username"
-                    id="username"
-                    placeholder="Enter your username..."
-                    className="border rounded w-full p-2 mb-4"
-                />
+                <form onSubmit={handleLogin}>
+                    <label htmlFor="username" className="block mb-1 font-medium">
+                        Username <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                        type="username"
+                        id="username"
+                        placeholder="Enter your username..."
+                        className="border rounded w-full p-2 mb-4"
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
 
-                {/* Password Field */}
-                <label htmlFor="password" className="block mb-1 font-medium">
-                    Password <span className="text-red-500">*</span>
-                </label>
-                <input
-                    type="password"
-                    id="password"
-                    placeholder="Enter your password..."
-                    className="border rounded w-full p-2 mb-4"
-                />
+                    {/* Password Field */}
+                    <label htmlFor="password" className="block mb-1 font-medium">
+                        Password <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Enter your password..."
+                        className="border rounded w-full p-2 mb-4"
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
 
-                {/* Login Button */}
-                <button className="bg-blue-600 text-white w-full p-2 rounded mb-6 hover:bg-blue-700 text-lg">
-                    Login
-                </button>
+                    {/* Login Button */}
+                    <button
+                        type="submit"
+                        className="bg-blue-600 text-white w-full p-2 rounded mb-6 hover:bg-blue-700 text-lg"
+                    >
+                        Login
+                    </button>
 
-                {/* Sign Up Link */}
-                <p className="text-m text-center">
-                    Don&apos;t have an account?{" "}
-                    <Link href="/signup" className="text-blue-600 underline">
-                        Sign Up!
-                    </Link>
-                </p>
+                    {/* Sign Up Link */}
+                    <p className="text-m text-center">
+                        Don&apos;t have an account?{" "}
+                        <Link href="/signup" className="text-blue-600 underline">
+                            Sign Up!
+                        </Link>
+                    </p>
+                </form>
             </div>
 
 

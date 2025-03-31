@@ -57,21 +57,21 @@ const SignUpPage: React.FC = () => {
         setShowSurvey(true);
 
         // try following lines of code
-        // try {
-        //     await axios.post("http://localhost:8000/auth/register", {
-        //         username,
-        //         password,
-        //         email
-        //     });
+        try {
+            const response = await axios.post(
+                "http://localhost:8000/auth/register",
+                { username, password, email },
+                { headers: { "Content-Type": "application/json" }
+            });
 
-        //     // login user after successful registration
-        //     await auth.login(username, password);
+            // login user after successful registration
+            await auth.login(username, password);
             
-        //     // show survey after successful registration/login
-        //     setShowSurvey(true);
-        // } catch (error) {
-        //     console.error("Registration failed:", error);
-        // }
+            // show survey after successful registration/login
+            setShowSurvey(true);
+        } catch (error) {
+            console.error("Registration failed:", error);
+        }
     };
 
 
@@ -100,26 +100,26 @@ const SignUpPage: React.FC = () => {
         })
 
         // try following lines of code
-        // try {
-        //     // construct array of allergies from user
-        //     const allergyArray = allergies
-        //         .split(',')
-        //         .map(item => item.trim())
-        //         .filter(item => item.length > 0);
+        try {
+            // construct array of allergies from user
+            const allergyArray = allergies
+                .split(',')
+                .map(item => item.trim())
+                .filter(item => item.length > 0);
 
-        //     // send user preferences to backend to be processed
-        //     await axios.post(
-        //         "http://localhost:8000/user/preferences",
-        //         { age, height, weight, gender, activityLevel, dietPreference, allergyArray, exercisePreference, fitnessGoals, mealPrepAvailability, exerciseAvailability }, // survey items
-        //         { headers: { Authorization: `Bearer ${auth.user?.access_token}` } } // authorization for backend
-        //     );
+            // send user preferences to backend to be processed
+            await axios.post(
+                "http://localhost:8000/user/preferences",
+                { age, height, weight, gender, activityLevel, dietPreference, allergyArray, exercisePreference, fitnessGoals, mealPrepAvailability, exerciseAvailability }, // survey items
+                { headers: { Authorization: `Bearer ${auth.user?.access_token}` } } // authorization for backend
+            );
             
-        //     // redirect user to home page after submitting survey
-        //     router.push("/");
-        // } catch (error) { // catch all errors
-        //     // send error to console
-        //     console.error("Survey submission failed:", error);
-        // }
+            // redirect user to home page after submitting survey
+            router.push("/");
+        } catch (error) { // catch all errors
+            // send error to console
+            console.error("Survey submission failed:", error);
+        }
     };
 
 
