@@ -8,7 +8,7 @@ from typing import Optional
 
 load_dotenv()
 SQL_ALCHEMY_DATABASE_URL = os.getenv("SQL_ALCHEMY_DATABASE_URL")
-
+SQL_ALCHEMY_DATABASE_URL = "sqlite:///./caloriq.db" # Debug
 
 engine = create_engine(SQL_ALCHEMY_DATABASE_URL, echo=True)
 

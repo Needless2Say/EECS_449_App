@@ -99,9 +99,10 @@ const LoginPage: React.FC = () => {
                     {/* 
                         Replace /google-icon.png with your actual Google icon.
                         If you have it in /public, you can reference it directly.
+                        Kenny's Note: In Next.js the public folder is mapped to the root URL, so you don’t include the “public” portion of the URL.
                     */}
                     <Image
-                        src="/google-icon.png"
+                        src="/google_icon.png"
                         alt="Google"
                         width={20}
                         height={20}
@@ -114,7 +115,7 @@ const LoginPage: React.FC = () => {
                 <button className="border rounded w-full p-2 mb-2 flex items-center justify-center hover:bg-gray-100">
                     {/* Replace /facebook-icon.png with your actual Facebook icon. */}
                     <Image
-                        src="/facebook-icon.png"
+                        src="/facebook_icon.png"
                         alt="Facebook"
                         width={20}
                         height={20}
@@ -127,7 +128,7 @@ const LoginPage: React.FC = () => {
                 <button className="border rounded w-full p-2 mb-2 flex items-center justify-center hover:bg-gray-100">
                     {/* Replace /facebook-icon.png with your actual Facebook icon. */}
                     <Image
-                        src="/github-icon.png"
+                        src="/github_icon.png"
                         alt="GitHub"
                         width={20}
                         height={20}
