@@ -68,6 +68,7 @@ class User(SQLModel, table=True):
     diet_preference: Optional[str] = None  # CSV format like "Vegan,Keto"
     allergies: Optional[str] = None  # CS2V format like "Nuts,Dairy"
     exercise_availability: Optional[list[DayOfWeek]] = Field(default_factory=list, sa_column=Column(JSON))
+    meal_prep_availability: Optional[list[DayOfWeek]] = Field(default_factory=list, sa_column=Column(JSON))
 
     # meal preferences
     liked_meals: Optional[list[str]] = Field(default_factory=list, sa_column=Column(JSON))
@@ -149,5 +150,6 @@ def print_user_info():
             
 # Call the function to print user information (for testing)
 print_user_info()
+
 
 
