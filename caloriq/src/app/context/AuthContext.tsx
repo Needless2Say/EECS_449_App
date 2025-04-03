@@ -66,7 +66,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			setUser(response.data);
 
 			// redirect user to homepage
-			router.push("/");
+			// router.push("/");
 
 		} catch (error) { // catch any errors during login
 			// output error message to user

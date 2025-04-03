@@ -1,13 +1,12 @@
 from typing import Annotated
 from sqlalchemy.orm import Session
-from sqlmodel import Session
+from sqlmodel import Session, create_engine
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from jose import jwt, JWTError
 from dotenv import load_dotenv
 import os
-from .database import get_session
 
 
 load_dotenv()
@@ -15,6 +14,23 @@ load_dotenv()
 # Grab SECRET_KEY and ALGORITHM from our .env folder
 SECRET_KEY = os.getenv("AUTH_SECRET_KEY")
 ALGORITHM = os.getenv("AUTH_ALGORITHM")
+SQL_ALCHEMY_DATABASE_URL = os.getenv("SQL_ALCHEMY_DATABASE_URL")
+
+
+def get_engine():
+    """
+    Get Engine To Database
+    """
+    return create_engine(SQL_ALCHEMY_DATABASE_URL, echo=True)
+
+
+def get_session():
+    """
+    Get Connection and Create Session to Database
+    """
+    engine = get_engine()
+    return Session(engine)
+
 
 # Creates a database session
 def get_db():

@@ -9,11 +9,12 @@ import re
 import ollama
 import requests
 import json
-from database import User
+from .database import User
 from dotenv import load_dotenv
+from .deps import get_engine
 
 
-engine = create_engine("sqlite:///orm.db")
+engine = get_engine()
 
 load_dotenv()
 
