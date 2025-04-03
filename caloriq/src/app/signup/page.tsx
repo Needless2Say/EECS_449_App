@@ -313,8 +313,8 @@ const SignUpPage: React.FC = () => {
                             <option value="">Select One...</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
-                            <option value="Non-Binary">Non-Binary</option>
-                            <option value="Prefer Not to Say">Prefer Not to Say</option>
+                            <option value="Other">Other</option>
+                            <option value="Prefer not to say">Prefer not to say</option>
                         </select>
 
                         {/* Activity Level (Optional) */}
@@ -329,9 +329,8 @@ const SignUpPage: React.FC = () => {
                         >
                             <option value="">Select One...</option>
                             <option value="Sedentary">Sedentary</option>
-                            <option value="Light">Light</option>
-                            <option value="Moderate">Moderate</option>
-                            <option value="Active">Active</option>
+                            <option value="Lightly Active">Lightly Active</option>
+                            <option value="Moderately Active">Moderately Active</option>
                             <option value="Very Active">Very Active</option>
                         </select>
 
@@ -341,11 +340,17 @@ const SignUpPage: React.FC = () => {
                         </label>
                         <select
                             id="dietpreference"
-                            value={activityLevel}
+                            value={dietPreference}
                             onChange={(e) => setDietPreference(e.target.value)}
                             className="border rounded w-full p-2 mb-4"
                         >
                             <option value="">Select One...</option>
+                            <option value="Carnivore">Carnivore</option>
+                            <option value="Omnivore">Omnivore</option>
+                            <option value="Vegan">Vegan</option>
+                            <option value="Keto">Keto</option>
+                            <option value="Vegitarian">Vegitarian</option>
+                            <option value="Other">Other</option>
                         </select>
 
                         {/* Allergies (Optional) */}
@@ -379,7 +384,10 @@ const SignUpPage: React.FC = () => {
                         </label>
                         <div className="border rounded w-full p-2 mb-4 space-y-2">
                             {[
-                                "Choose 1",
+                                "Cardio",
+                                "Strength Training",
+                                "Flexibility & Mobility",
+                                "High-Intensity Interval Training (HIIT)",
                             ].map((goal) => (
                                 <label
                                     key={goal}
@@ -410,10 +418,13 @@ const SignUpPage: React.FC = () => {
                         </label>
                         <div className="border rounded w-full p-2 mb-4 space-y-2">
                             {[
-                                "Lose Weight",
-                                "Build Muscle",
+                                "Weight Loss",
+                                "Gain Muscle",
                                 "Increase Endurance",
-                                "Maintain Fitness",
+                                "Improve Flexibility",
+                                "General Fitness",
+                                "Sports Performance",
+                                "Maintain Weight",
                             ].map((goal) => (
                                 <label
                                     key={goal}
@@ -444,27 +455,13 @@ const SignUpPage: React.FC = () => {
                         </label>
                         <div className="border rounded w-full p-2 mb-4 space-y-2">
                             {[
-                                "Monday Morning",
-                                "Monday Afternoon",
-                                "Monday Evening",
-                                "Tuesday Morning",
-                                "Tuesday Afternoon",
-                                "Tuesday Evening",
-                                "Wednesday Morning",
-                                "Wednesday Afternoon",
-                                "Wednesday Evening",
-                                "Thursday Morning",
-                                "Thursday Afternoon",
-                                "Thursday Evening",
-                                "Friday Morning",
-                                "Friday Afternoon",
-                                "Friday Evening",
-                                "Saturday Morning",
-                                "Saturday Afternoon",
-                                "Saturday Evening",
-                                "Sunday Morning",
-                                "Sunday Afternoon",
-                                "Sunday Evening",
+                                "Monday",
+                                "Tuesday",
+                                "Wednesday",
+                                "Thursday",
+                                "Friday",
+                                "Saturday",
+                                "Sunday",
                             ].map((goal) => (
                                 <label
                                     key={goal}
@@ -495,27 +492,13 @@ const SignUpPage: React.FC = () => {
                         </label>
                         <div className="border rounded w-full p-2 mb-4 space-y-2">
                             {[
-                                "Monday Morning",
-                                "Monday Afternoon",
-                                "Monday Evening",
-                                "Tuesday Morning",
-                                "Tuesday Afternoon",
-                                "Tuesday Evening",
-                                "Wednesday Morning",
-                                "Wednesday Afternoon",
-                                "Wednesday Evening",
-                                "Thursday Morning",
-                                "Thursday Afternoon",
-                                "Thursday Evening",
-                                "Friday Morning",
-                                "Friday Afternoon",
-                                "Friday Evening",
-                                "Saturday Morning",
-                                "Saturday Afternoon",
-                                "Saturday Evening",
-                                "Sunday Morning",
-                                "Sunday Afternoon",
-                                "Sunday Evening",
+                                "Monday",
+                                "Tuesday",
+                                "Wednesday",
+                                "Thursday",
+                                "Friday",
+                                "Saturday",
+                                "Sunday",
                             ].map((goal) => (
                                 <label
                                     key={goal}

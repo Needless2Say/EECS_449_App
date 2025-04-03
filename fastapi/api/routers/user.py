@@ -34,9 +34,12 @@ ALGORITHM = os.getenv("AUTH_ALGORITHM")
 class Config:
     orm_mode: bool = True
 
+
 async def get_user(db, request):
     auth_header = request.headers.get("Authorization")
+    print(auth_header)
     if not auth_header or not auth_header.startswith("Bearer "):
+        print("Invalid or missing token")
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or missing token")
 
     token = auth_header.split(" ")[1]
@@ -44,23 +47,30 @@ async def get_user(db, request):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("id")
+        print(user_id)
 
         if user_id is None:
+            print("Invalid token")
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
     except JWTError:
+        print("Could not validate credentials")
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
 
     user = db.exec(select(User).where(User.id == int(user_id))).first()
     if not user:
+        print("User not found")
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     else:
+        print("VALID USER")
         return user
+
 
 @router.post('/preferences', status_code=status.HTTP_201_CREATED)
 async def get_data(db: db_dependency, request: Request):
-    user = get_user(db, request)
-    
+    print("USER PREFERENCES!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    user = await get_user(db, request)
+    print("USER PREFERENCES!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     user_data = await request.json()
 
     #turn inputs into data types of database, some inputs lists, have to turn into comma separated strings
@@ -80,6 +90,8 @@ async def get_data(db: db_dependency, request: Request):
 
     db.commit()
     db.refresh(user)
+
+    print("IT WORKS!!!!!!!!!!!!!!!!!!!!")
 
     return {"message": "User preferences updated successfully"}   
 

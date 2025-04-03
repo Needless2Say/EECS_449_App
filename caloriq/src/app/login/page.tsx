@@ -5,11 +5,15 @@ import Image from "next/image";
 import Link from "next/link";
 import axios from "axios";
 import AuthContext from "../context/AuthContext";
+import { useRouter } from "next/navigation";
 
 
 const LoginPage: React.FC = () => {
     // create authentication variable by getting return value from custom context AuthContext
     const auth = useContext(AuthContext);
+
+    // router for redirecting user
+    const router = useRouter();
 
     // check if user is logged in on or
     if (!auth) {
@@ -33,6 +37,9 @@ const LoginPage: React.FC = () => {
 
         // call login function from authentication context with existing user credentials
         login(username, password);
+
+        // redirect user to homepage
+		router.push("/");
     };
 
 

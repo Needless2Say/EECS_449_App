@@ -5,12 +5,39 @@ from typing import Optional
 import requests
 import datetime
 import os
+# from .deps import get_engine
+from dotenv import load_dotenv
+import os
+
+
+load_dotenv()
+
+# Grab SECRET_KEY and ALGORITHM from our .env folder
+SECRET_KEY = os.getenv("AUTH_SECRET_KEY")
+ALGORITHM = os.getenv("AUTH_ALGORITHM")
+SQL_ALCHEMY_DATABASE_URL = os.getenv("SQL_ALCHEMY_DATABASE_URL")
+
+
+def get_engine():
+    """
+    Get Engine To Database
+    """
+    return create_engine(SQL_ALCHEMY_DATABASE_URL, echo=True)
+
+
+def get_session():
+    """
+    Get Connection and Create Session to Database
+    """
+    engine = get_engine()
+    return Session(engine)
+
+
 
 
 if os.path.exists("orm.db"):
     os.remove("orm.db")
 
-engine = create_engine('sqlite:///orm.db', echo=True)
 
 class ActivityLevel(str, Enum):
     SEDENTARY = "Sedentary"
@@ -54,9 +81,9 @@ class User(SQLModel, table=True):
     id: int = Field(primary_key=True, sa_column_kwargs={"autoincrement": True})
     username: str = Field(unique=True, index=True)
     email: str = Field(unique=True, index=True)
-    hashed_password: str = Field(unique=True)
-    first_name: str 
-    last_name: str
+    password: str = Field(unique=True)
+    first_name: Optional[str] 
+    last_name: Optional[str] 
     age: Optional[int]
     gender: Optional[Gender] = Field(default=None, sa_column=Column(JSON))
     height_cm: Optional[float]
@@ -80,7 +107,9 @@ class User(SQLModel, table=True):
 
 
 # Create all tables
+engine = get_engine()
 SQLModel.metadata.create_all(engine)
+
 
 # Example: usage with a session (we created a random user and tested)
 with Session(engine) as session:
@@ -90,9 +119,9 @@ with Session(engine) as session:
 
     # Create a new user
     user = User(
-        username="john_doe",
+        username="john",
         email="john@example.com",
-        hashed_password="hashed_password_here",
+        password="1234",
         first_name="John",
         last_name="Doe",
         age=30,
@@ -110,6 +139,7 @@ with Session(engine) as session:
     # Add and commit the user
     session.add(user)
     session.commit()
+
 
 # for testing
 def print_user_info(): 
@@ -149,7 +179,21 @@ def print_user_info():
             print("------------------------")
             
 # Call the function to print user information (for testing)
-print_user_info()
+# print_user_info()
 
 
 
+
+
+def check_users(): 
+    # Create a session
+    with Session(engine) as session:
+        # Query all users
+        statement = select(User)
+        users = session.exec(statement).all()
+        print(len(users))
+        print()
+        print(users)
+        
+print("\n\n USERSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS \n")
+check_users()
