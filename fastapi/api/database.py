@@ -33,8 +33,6 @@ def get_session():
     return Session(engine)
 
 
-
-
 if os.path.exists("orm.db"):
     os.remove("orm.db")
 
@@ -74,7 +72,7 @@ class DayOfWeek(str, Enum):
     THURSDAY = "Thursday"
     FRIDAY = "Friday"
     SATURDAY = "Saturday"
-    SUNDAY = "Sunday"
+    SUNDAY = "Sunday"   
     
 
 class User(SQLModel, table=True):
@@ -97,6 +95,10 @@ class User(SQLModel, table=True):
     exercise_availability: Optional[list[DayOfWeek]] = Field(default_factory=list, sa_column=Column(JSON))
     meal_prep_availability: Optional[list[DayOfWeek]] = Field(default_factory=list, sa_column=Column(JSON))
 
+    # columns for meal and workout plans
+    meal_plan: Optional[dict] = Field(default=None, sa_column=Column(JSON))
+    workout_plan: Optional[dict] = Field(default=None, sa_column=Column(JSON))
+
     # meal preferences
     liked_meals: Optional[list[str]] = Field(default_factory=list, sa_column=Column(JSON))
     disliked_meals: Optional[list[str]] = Field(default_factory=list, sa_column=Column(JSON))
@@ -112,38 +114,39 @@ SQLModel.metadata.create_all(engine)
 
 
 # Example: usage with a session (we created a random user and tested)
-with Session(engine) as session:
-    session.exec(delete(User))
-    session.commit()
-    print("All users and workout plans deleted.")
+# with Session(get_engine()) as session:
+#     session.exec(delete(User))
+#     session.commit()
+#     print("All users and workout plans deleted.")
 
-    # Create a new user
-    user = User(
-        username="john",
-        email="john@example.com",
-        password="1234",
-        first_name="John",
-        last_name="Doe",
-        age=30,
-        gender=[Gender.MALE],
-        height_cm=180.0,
-        weight_kg=75.0,
-        activity_level=[ActivityLevel.MODERATELY_ACTIVE],
-        fitness_goals=[FitnessGoals.WEIGHT_LOSS, FitnessGoals.GAIN_MUSCLE],
-        exercise_preferences=[ExercisePreferences.CARDIO, ExercisePreferences.STRENGTH_TRAINING],
-        diet_preference="Vegan",
-        allergies="Nuts",
-        exercise_availability=[DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY, DayOfWeek.SUNDAY],
-    )
+#     # Create a new user
+#     user = User(
+#         username="john",
+#         email="john@example.com",
+#         password="1234",
+#         first_name="John",
+#         last_name="Doe",
+#         age=30,
+#         gender=[Gender.MALE],
+#         height_cm=180.0,
+#         weight_kg=75.0,
+#         activity_level=[ActivityLevel.MODERATELY_ACTIVE],
+#         fitness_goals=[FitnessGoals.WEIGHT_LOSS, FitnessGoals.GAIN_MUSCLE],
+#         exercise_preferences=[ExercisePreferences.CARDIO, ExercisePreferences.STRENGTH_TRAINING],
+#         diet_preference="Vegan",
+#         allergies="Nuts",
+#         exercise_availability=[DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY, DayOfWeek.SUNDAY],
+#     )
 
-    # Add and commit the user
-    session.add(user)
-    session.commit()
+#     # Add and commit the user
+#     session.add(user)
+#     session.commit()
 
 
 # for testing
 def print_user_info(): 
     # Create a session
+    engine = get_engine()
     with Session(engine) as session:
         # Query all users
         statement = select(User)
@@ -163,10 +166,10 @@ def print_user_info():
             print(f"First Name: {user.first_name}")
             print(f"Last Name: {user.last_name}")
             print(f"Age: {user.age}")
-            print(f"Gender: {', '.join(user.gender)}")
+            print(f"Gender: {user.gender}")
             print(f"Height (cm): {user.height_cm}")
             print(f"Weight (kg): {user.weight_kg}")
-            print(f"Activity Level: {', '.join(user.activity_level)}")
+            print(f"Activity Level: {user.activity_level}")
             print(f"Fitness Goals: {', '.join(user.fitness_goals)}")
             print(f"Exercise Preference: {', '.join(user.exercise_preferences)}")
             print(f"Diet Preference: {user.diet_preference}")
@@ -176,24 +179,26 @@ def print_user_info():
             print(f"Disiked Meals: {', '.join(user.disliked_meals)}")
             print(f"Liked Workouts: {', '.join(user.liked_workouts)}")
             print(f"Disliked Workouts: {', '.join(user.disliked_workouts)}")
+            print(f"Meal Plan: {user.meal_plan}")
+            print(f"Workout Plan: {user.workout_plan}")
             print("------------------------")
             
 # Call the function to print user information (for testing)
-# print_user_info()
+print_user_info()
 
 
 
 
 
-def check_users(): 
-    # Create a session
-    with Session(engine) as session:
-        # Query all users
-        statement = select(User)
-        users = session.exec(statement).all()
-        print(len(users))
-        print()
-        print(users)
+# def check_users(): 
+#     # Create a session
+#     with Session(get_engine()) as session:
+#         # Query all users
+#         statement = select(User)
+#         users = session.exec(statement).all()
+#         print(len(users))
+#         print()
+#         print(users)
         
-print("\n\n USERSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS \n")
-check_users()
+# print("\n\n USERSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS \n")
+# check_users()

@@ -1,29 +1,22 @@
 "use client";
 
-import React, { useContext, useState, useEffect, useRef, FormEvent } from "react";
+import React, { useContext, useState, FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import AuthContext from "../context/AuthContext";
-import { PlanContext } from "../context/PlanContext";
 
 
 const SignUpPage: React.FC = () => {
     // create authentication variable by getting return value from custom context AuthContext
     const auth = useContext(AuthContext);
 
-    // create meal and workout plan context variables by getting return value from custom context PlanContext
-    const { setMealPlan, setWorkoutPlan } = useContext(PlanContext)!;
-
     // initialize router for redirecting or routing user to different pages
     const router = useRouter();
 
     // state to toggle survey display state
     const [showSurvey, setShowSurvey] = useState(false);
-
-    // loading state for overlay
-    const [loading, setLoading] = useState(false);
 
     // signup form states
     const [username, setUsername] = useState("");
@@ -43,147 +36,128 @@ const SignUpPage: React.FC = () => {
     const [mealPrepAvailability, setMealPrepAvailability] = useState<string[]>([]);
     const [exerciseAvailability, setExerciseAvailability] = useState<string[]>([]);
 
-    // Check if auth is available
+
+    // check if auth is a valid variable
     if (!auth) {
         throw new Error("AuthContext is not available! Did you forget to wrap <AuthProvider>?");
     }
-    // const { login } = auth;
 
-    // Function to register new user
-    const handleRegister = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+
+    // function to register new user
+    const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
+        // prevent default form submission behavior (normally reloads page)
         e.preventDefault();
-        console.log({ username, password, email });
+
+        console.log({
+            "username": username,
+            "password": password,
+            "email": email
+        });
+
         setShowSurvey(true);
 
+        // try following lines of code
         try {
             const response = await axios.post(
                 "http://localhost:8000/auth/register",
                 { username, password, email },
-                { headers: { "Content-Type": "application/json" } }
-            );
+                { headers: { "Content-Type": "application/json" }
+            });
 
-            // Login user after successful registration
+            // login user after successful registration
             await auth.login(username, password);
+            
+            // show survey after successful registration/login
             setShowSurvey(true);
-
         } catch (error) {
             console.error("Registration failed:", error);
         }
     };
 
-    // Function to submit survey answers and generate plans
+
+    // function to send survey answers to backend
     const handleSurveySubmit = async (e: FormEvent<HTMLFormElement>) => {
+        // prevent default form submission behavior (normally reloads page)
         e.preventDefault();
 
-        // Process allergies input into a formatted comma-separated string
         const allergyArray = allergies
-            .split(",")
-            .map((item) => item.trim())
-            .filter((item) => item.length > 0);
+            .split(',')
+            .map(item => item.trim())
+            .filter(item => item.length > 0);
 
         console.log({
-            age,
-            height,
-            weight,
-            gender,
-            activityLevel,
-            dietPreference,
-            allergies: allergyArray,
-            exercisePreference,
-            fitnessGoals,
-            mealPrepAvailability,
-            exerciseAvailability,
-        });
+            "age": age,
+            "height": height,
+            "weight": weight,
+            "gender": gender,
+            "activity level": activityLevel,
+            "diet preference": dietPreference,
+            "allergies": allergyArray,
+            "exercise preference": exercisePreference,
+            "fitness goals": fitnessGoals,
+            "meal prep availability": mealPrepAvailability,
+            "exercise availability": exerciseAvailability
+        })
 
+        // try following lines of code
         try {
-            // Send survey answers to backend
-            await axios.post(
+            // construct array of allergies from user
+            const allergyArray = allergies
+                .split(',')
+                .map(item => item.trim())
+                .filter(item => item.length > 0);
+
+            // send user preferences to backend to be processed
+            const response = await axios.post(
                 "http://localhost:8000/user/preferences",
-                {
-                    age,
-                    height,
-                    weight,
-                    gender,
-                    activityLevel,
-                    dietPreference,
-                    allergies: allergyArray,
-                    exercisePreference,
-                    fitnessGoals,
-                    mealPrepAvailability,
-                    exerciseAvailability,
-                },
-                { headers: { Authorization: `Bearer ${auth.user?.access_token}` } }
+                { age, height, weight, gender, activityLevel, dietPreference, allergyArray, exercisePreference, fitnessGoals, mealPrepAvailability, exerciseAvailability }, // survey items
+                { headers: { Authorization: `Bearer ${auth.user?.access_token}` } } // authorization for backend
             );
+            
+            // if (response.status !== 200) {
+            //     throw new Error("Failed to submit survey");
+            // }
 
-            // Set loading state to show overlay
-            setLoading(true);
-
-            // Fire both the meal and workout plan API requests in parallel
+            // call functions to generate meal and workout plan for user
             const [meal_response, workout_response] = await Promise.all([
                 axios.post(
                     "http://localhost:8000/user/meals",
-                    { headers: { Authorization: `Bearer ${auth.user?.access_token}` } }
+                    { headers: { Authorization: `Bearer ${auth.user?.access_token}` } } // authorization for backend
                 ),
                 axios.post(
                     "http://localhost:8000/user/workouts",
-                    { headers: { Authorization: `Bearer ${auth.user?.access_token}` } }
-                ),
+                    { headers: { Authorization: `Bearer ${auth.user?.access_token}` } } // authorization for backend
+                )
             ]);
 
-            // log meal and workout responses to console
+            // const meal_response = await axios.post(
+            //     "http://localhost:8000/user/meals",
+            //     { headers: { Authorization: `Bearer ${auth.user?.access_token}` } } // authorization for backend
+            // );
+
+            // print data
             console.log(meal_response.data);
             console.log(workout_response.data);
 
-            // save meal and workout plans to PlanContext
-            setMealPlan(meal_response.data.meal_plan);
-            setWorkoutPlan(workout_response.data.excercise_plan);
-
-            // Redirect the user to the home page after responses are received
+            // redirect user to home page after submitting survey
             router.push("/");
-
-        } catch (error) {
+        } catch (error) { // catch all errors
+            // send error to console
             console.error("Survey submission failed:", error);
-        } finally {
-            setLoading(false);
         }
     };
 
-    // Profile menu state and reference for clicking outside
-    const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-    const profileMenuRef = useRef<HTMLDivElement>(null);
-    const toggleProfileMenu = () => setProfileMenuOpen((prev) => !prev);
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
-                setProfileMenuOpen(false);
-            }
-        };
-
-        if (profileMenuOpen) {
-            document.addEventListener("mousedown", handleClickOutside);
-        }
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-
-    }, [profileMenuOpen]);
-
-    const handleLogin = () => {
-        setProfileMenuOpen(false);
-        router.push("/login");
-    };
-
-    const handleLogout = () => {
-        console.log("Logging out...");
-        // Insert logout logic here
-    };
 
     return (
-        <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4 text-black relative">
+        <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4 text-black">
             {!showSurvey ? (
+                // Sign Up Form
                 <>
-                    {/* Sign Up Form */}
                     <div className="w-full max-w-md bg-white rounded shadow p-6">
-                        <h2 className="text-2xl font-bold mb-4 text-center">Sign Up</h2>
+                        <h2 className="text-2xl font-bold mb-4 text-center">
+                            Sign Up
+                        </h2>
+
                         <form onSubmit={handleRegister}>
                             {/* Username Field */}
                             <label htmlFor="username" className="block mb-1 font-medium">
@@ -227,7 +201,7 @@ const SignUpPage: React.FC = () => {
                                 required
                             />
 
-                            {/* Create Account Button */}
+                            {/* Create Account Button - changed to type="submit" */}
                             <button
                                 type="submit"
                                 className="bg-blue-600 text-white w-full p-2 rounded mb-6 hover:bg-blue-700 text-lg"
@@ -239,21 +213,29 @@ const SignUpPage: React.FC = () => {
                             <p className="text-m text-center">
                                 Already have an account?{" "}
                                 <Link href="/login" className="text-blue-600 underline">
-                                Login
+                                    Login
                                 </Link>
                             </p>
                         </form>
                     </div>
 
+
                     {/* Horizontal Divider */}
                     <hr className="w-full max-w-md my-6 border-t-2 border-black" />
 
-                    {/* Lower Section: Social Logins */}
+
+                    {/* Lower Section: Create Account (Social Logins) */}
                     <div className="w-full max-w-md bg-white rounded shadow p-6">
                         <h3 className="text-xl font-semibold mb-4 text-center">
                             Login / Create Account
                         </h3>
+
+                        {/* Google Auth Button */}
                         <button className="border rounded w-full p-2 mb-2 flex items-center justify-center hover:bg-gray-100">
+                            {/* 
+                                Replace /google-icon.png with your actual Google icon.
+                                If you have it in /public, you can reference it directly.
+                            */}
                             <Image
                                 src="/google-icon.png"
                                 alt="Google"
@@ -261,9 +243,12 @@ const SignUpPage: React.FC = () => {
                                 height={20}
                                 className="mr-2"
                             />
-                            Continue with Google
+                                Continue with Google
                         </button>
+
+                        {/* Facebook Auth Button */}
                         <button className="border rounded w-full p-2 mb-2 flex items-center justify-center hover:bg-gray-100">
+                            {/* Replace /facebook-icon.png with your actual Facebook icon. */}
                             <Image
                                 src="/facebook-icon.png"
                                 alt="Facebook"
@@ -271,9 +256,12 @@ const SignUpPage: React.FC = () => {
                                 height={20}
                                 className="mr-2"
                             />
-                            Continue with Facebook
+                                Continue with Facebook
                         </button>
+
+                        {/* GitHub Auth Button */}
                         <button className="border rounded w-full p-2 mb-2 flex items-center justify-center hover:bg-gray-100">
+                            {/* Replace /facebook-icon.png with your actual Facebook icon. */}
                             <Image
                                 src="/github-icon.png"
                                 alt="GitHub"
@@ -281,17 +269,24 @@ const SignUpPage: React.FC = () => {
                                 height={20}
                                 className="mr-2"
                             />
-                            Continue with GitHub
+                                Continue with GitHub
                         </button>
+
+                        {/* Add other social auth providers below, e.g. Apple, Twitter, GitHub, etc. */}
+
+
                     </div>
                 </>
+                
             ) : (
                 /* Survey Form */
                 <div className="w-full max-w-md bg-white rounded shadow p-6">
                     <h2 className="text-xl font-semibold mb-4 text-center">
                         User Preferences Survey
                     </h2>
+
                     <form onSubmit={handleSurveySubmit}>
+                        {/* Age (Optional) */}
                         <label htmlFor="age" className="block mb-1 font-medium">
                             Age (Optional)
                         </label>
@@ -304,6 +299,7 @@ const SignUpPage: React.FC = () => {
                             className="border rounded w-full p-2 mb-4"
                         />
 
+                        {/* Height (Optional) */}
                         <label htmlFor="height" className="block mb-1 font-medium">
                             Height (Optional)
                         </label>
@@ -316,6 +312,7 @@ const SignUpPage: React.FC = () => {
                             className="border rounded w-full p-2 mb-4"
                         />
 
+                        {/* Weight (Optional) */}
                         <label htmlFor="weight" className="block mb-1 font-medium">
                             Weight (Optional)
                         </label>
@@ -328,6 +325,7 @@ const SignUpPage: React.FC = () => {
                             className="border rounded w-full p-2 mb-4"
                         />
 
+                        {/* Gender (Optional) */}
                         <label htmlFor="gender" className="block mb-1 font-medium">
                             Gender (Optional)
                         </label>
@@ -344,6 +342,7 @@ const SignUpPage: React.FC = () => {
                             <option value="Prefer not to say">Prefer not to say</option>
                         </select>
 
+                        {/* Activity Level (Optional) */}
                         <label htmlFor="activityLevel" className="block mb-1 font-medium">
                             Activity Level (Optional)
                         </label>
@@ -360,11 +359,12 @@ const SignUpPage: React.FC = () => {
                             <option value="Very Active">Very Active</option>
                         </select>
 
-                        <label htmlFor="dietPreference" className="block mb-1 font-medium">
+                        {/* Diet Preference (Optional) - changed to SELECT */}
+                        <label htmlFor="dietpreference" className="block mb-1 font-medium">
                             Diet Preference (Optional)
                         </label>
                         <select
-                            id="dietPreference"
+                            id="dietpreference"
                             value={dietPreference}
                             onChange={(e) => setDietPreference(e.target.value)}
                             className="border rounded w-full p-2 mb-4"
@@ -374,10 +374,11 @@ const SignUpPage: React.FC = () => {
                             <option value="Omnivore">Omnivore</option>
                             <option value="Vegan">Vegan</option>
                             <option value="Keto">Keto</option>
-                            <option value="Vegetarian">Vegetarian</option>
+                            <option value="Vegitarian">Vegitarian</option>
                             <option value="Other">Other</option>
                         </select>
 
+                        {/* Allergies (Optional) */}
                         <label htmlFor="allergies" className="block mb-1 font-medium">
                             Allergies (Optional)
                         </label>
@@ -385,20 +386,25 @@ const SignUpPage: React.FC = () => {
                             id="allergies"
                             type="text"
                             value={allergies}
-                            onChange={(e) => setAllergies(e.target.value)}
+                            onChange={(e) => {
+                                // store raw input value
+                                setAllergies(e.target.value);
+                            }}
                             onBlur={(e) => {
+                                // process and format on blur
                                 const processed = e.target.value
-                                .split(",")
-                                .map((item) => item.trim())
-                                .filter((item) => item.length > 0)
-                                .join(", ");
+                                    .split(',')
+                                    .map(item => item.trim())
+                                    .filter(item => item.length > 0)
+                                    .join(', ');
                                 setAllergies(processed);
                             }}
                             placeholder="e.g. peanuts, gluten, dairy..."
                             className="border rounded w-full p-2 mb-4"
                         />
 
-                        <label htmlFor="exercisePreference" className="block mb-1 font-medium">
+                        {/* Exercise Preference (Optional) - changed to SELECT */}
+                        <label htmlFor="exercisepreferences" className="block mb-1 font-medium">
                             Exercise Preference (Optional) - Select Multiple
                         </label>
                         <div className="border rounded w-full p-2 mb-4 space-y-2">
@@ -409,28 +415,29 @@ const SignUpPage: React.FC = () => {
                                 "High-Intensity Interval Training (HIIT)",
                             ].map((goal) => (
                                 <label
-                                key={goal}
-                                className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
+                                    key={goal}
+                                    className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
                                 >
-                                <input
-                                    type="checkbox"
-                                    value={goal}
-                                    checked={exercisePreference.includes(goal)}
-                                    onChange={(e) => {
-                                    const value = e.target.value;
-                                    setExercisePreference((prev) =>
-                                        prev.includes(value)
-                                        ? prev.filter((item) => item !== value)
-                                        : [...prev, value]
-                                    );
-                                    }}
-                                    className="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300"
-                                />
-                                <span className="text-gray-700">{goal}</span>
+                                    <input
+                                        type="checkbox"
+                                        value={goal}
+                                        checked={exercisePreference.includes(goal)}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setExercisePreference(prev => 
+                                                prev.includes(value)
+                                                    ? prev.filter(item => item !== value) // Remove if exists
+                                                    : [...prev, value] // Add if new
+                                            );
+                                        }}
+                                        className="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300"
+                                    />
+                                    <span className="text-gray-700">{goal}</span>
                                 </label>
                             ))}
                         </div>
 
+                        {/* Fitness Goals (Optional) - changed to SELECT */}
                         <label htmlFor="fitnessGoals" className="block mb-1 font-medium">
                             Fitness Goals (Optional) - Select Multiple
                         </label>
@@ -467,7 +474,8 @@ const SignUpPage: React.FC = () => {
                             ))}
                         </div>
 
-                        <label htmlFor="mealPrepAvailability" className="block mb-1 font-medium">
+                        {/* Meal Prep Availability (Optional) - changed to SELECT */}
+                        <label htmlFor="mealprepavailability" className="block mb-1 font-medium">
                             Meal Prep Availability (Optional) - Select Multiple
                         </label>
                         <div className="border rounded w-full p-2 mb-4 space-y-2">
@@ -479,31 +487,32 @@ const SignUpPage: React.FC = () => {
                                 "Friday",
                                 "Saturday",
                                 "Sunday",
-                            ].map((day) => (
+                            ].map((goal) => (
                                 <label
-                                key={day}
-                                className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
+                                    key={goal}
+                                    className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
                                 >
-                                <input
-                                    type="checkbox"
-                                    value={day}
-                                    checked={mealPrepAvailability.includes(day)}
-                                    onChange={(e) => {
-                                    const value = e.target.value;
-                                    setMealPrepAvailability((prev) =>
-                                        prev.includes(value)
-                                        ? prev.filter((item) => item !== value)
-                                        : [...prev, value]
-                                    );
-                                    }}
-                                    className="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300"
-                                />
-                                <span className="text-gray-700">{day}</span>
+                                    <input
+                                        type="checkbox"
+                                        value={goal}
+                                        checked={mealPrepAvailability.includes(goal)}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setMealPrepAvailability(prev => 
+                                                prev.includes(value)
+                                                    ? prev.filter(item => item !== value) // Remove if exists
+                                                    : [...prev, value] // Add if new
+                                            );
+                                        }}
+                                        className="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300"
+                                    />
+                                    <span className="text-gray-700">{goal}</span>
                                 </label>
                             ))}
                         </div>
 
-                        <label htmlFor="exerciseAvailability" className="block mb-1 font-medium">
+                        {/* Exercise Availability (Optional) - changed to SELECT */}
+                        <label htmlFor="exerciseavailability" className="block mb-1 font-medium">
                             Exercise Availability (Optional) - Select Multiple
                         </label>
                         <div className="border rounded w-full p-2 mb-4 space-y-2">
@@ -515,45 +524,39 @@ const SignUpPage: React.FC = () => {
                                 "Friday",
                                 "Saturday",
                                 "Sunday",
-                            ].map((day) => (
+                            ].map((goal) => (
                                 <label
-                                key={day}
-                                className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
+                                    key={goal}
+                                    className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
                                 >
-                                <input
-                                    type="checkbox"
-                                    value={day}
-                                    checked={exerciseAvailability.includes(day)}
-                                    onChange={(e) => {
-                                    const value = e.target.value;
-                                    setExerciseAvailability((prev) =>
-                                        prev.includes(value)
-                                        ? prev.filter((item) => item !== value)
-                                        : [...prev, value]
-                                    );
-                                    }}
-                                    className="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300"
-                                />
-                                <span className="text-gray-700">{day}</span>
+                                    <input
+                                        type="checkbox"
+                                        value={goal}
+                                        checked={exerciseAvailability.includes(goal)}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setExerciseAvailability(prev => 
+                                                prev.includes(value)
+                                                    ? prev.filter(item => item !== value) // Remove if exists
+                                                    : [...prev, value] // Add if new
+                                            );
+                                        }}
+                                        className="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300"
+                                    />
+                                    <span className="text-gray-700">{goal}</span>
                                 </label>
                             ))}
                         </div>
 
+                        {/* Submit Button */}
                         <button
                             type="submit"
                             className="bg-blue-600 text-white w-full p-2 rounded hover:bg-blue-700 text-lg"
+                            onClick={() => handleSurveySubmit}
                         >
                             Submit
                         </button>
                     </form>
-                </div>
-            )}
-
-            {/* Loading Overlay */}
-            {loading && (
-                <div className="fixed inset-0 flex flex-col items-center justify-center bg-gray-800 bg-opacity-75 z-50">
-                    <p className="text-white mb-4 text-lg">Loading Your Meal And Workout Plan</p>
-                    <div className="w-16 h-16 border-4 border-t-4 border-gray-200 rounded-full animate-spin"></div>
                 </div>
             )}
         </div>
