@@ -36,10 +36,17 @@ const LoginPage: React.FC = () => {
         e.preventDefault();
 
         // call login function from authentication context with existing user credentials
-        login(username, password);
+        try {
+            // log in user
+            login(username, password);
 
-        // redirect user to homepage
-		router.push("/");
+            // redirect user to homepage
+            router.push("/");
+        }
+        catch (error) {
+            console.error("Login failed:", error);
+        }       
+		
     };
 
 

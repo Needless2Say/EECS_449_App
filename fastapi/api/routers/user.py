@@ -7,7 +7,7 @@ from jose import jwt, JWTError
 from dotenv import load_dotenv
 import os
 from api.database import User, Gender, ExercisePreferences, FitnessGoals, DayOfWeek, ActivityLevel
-from api.deps import db_dependency, bcrpyt_context
+from api.deps import db_dependency, bcrpyt_context, user_dependency
 from sqlmodel import select
 from api.database import Gender, ActivityLevel, FitnessGoals
 from api.models import create_meal_plan, parse_meal_plan_to_dict, create_exercise_routine, parse_exercise_routine_to_dict
@@ -98,31 +98,53 @@ async def get_data(db: db_dependency, request: Request):
 @router.post('/meals', status_code=status.HTTP_201_CREATED)
 async def gen_meal_plan(db: db_dependency, request: Request):
     #need to decode header and get token for user_id if i'm going to store the meal plan data in the db to identify user.
-    user = get_user(db, request)
+    user = await get_user(db, request)
     
     try:
+        print("GENERATING MEAL PLAN")
         raw_meal_plan = create_meal_plan(user.id)
+        print("MEAL PLAN GENERATED")
         meal_plan_dict = parse_meal_plan_to_dict(raw_meal_plan)
-        return {"meal_plan": meal_plan_dict} #unclear whether i should store meal plans in user db or return to front end, we decided to do did latter
+        print(meal_plan_dict)
+
+        # update user's meal plan in the database
+        user.meal_plan = meal_plan_dict
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+        return {"meal_plan": meal_plan_dict}
+
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error generating meal plan: {str(e)}")
     
 @router.post('/workouts', status_code=status.HTTP_201_CREATED)
 async def gen_workout_plan(db: db_dependency, request: Request):
     #need to decode header and get token for user_id if i'm going to store the exercise plan data in the db to identify user.
-    user = get_user(db, request)
+    user = await get_user(db, request)
 
     try:
+        print("GENERATING WORKOUT PLAN")
         raw_exercise_plan = create_exercise_routine(user.id)
+        print("WORKOUT PLAN GENERATED")
         exercise_plan_dict = parse_exercise_routine_to_dict(raw_exercise_plan)
-        return {"excercise_plan": exercise_plan_dict} #unclear whether i should store exercise plans in user db or return to front end, we decided to do latter
+        print(exercise_plan_dict)
+        
+        # update user's workout plan in the database
+        user.workout_plan = exercise_plan_dict
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+        return {"excercise_plan": exercise_plan_dict}
+
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error generating workout plan: {str(e)}")\
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error generating workout plan: {str(e)}")
 
 @router.post('/keywords/liked-meal', status_code=status.HTTP_200_OK)
 async def liked_meal(db: db_dependency, request: Request):
     #get user from request header to get user.id, then get request JSON which will hold the text that we pass into the function
-    user = get_user(db, request)
+    user = await get_user(db, request)
     meal_data = await request.json()
 
     #pass in user.id and user inputted text, function stores info into database for user.
@@ -133,7 +155,7 @@ async def liked_meal(db: db_dependency, request: Request):
 @router.post('/keywords/disliked-meal', status_code=status.HTTP_200_OK)
 async def disliked_meal(db: db_dependency, request: Request):
     #get user from request header to get user.id, then get request JSON which will hold the text that we pass into the function
-    user = get_user(db, request)
+    user = await get_user(db, request)
     meal_data = await request.json()
 
     #pass in user.id and user inputted text, function stores info into database for user.
@@ -144,7 +166,7 @@ async def disliked_meal(db: db_dependency, request: Request):
 @router.post('/keywords/disliked-workout', status_code=status.HTTP_200_OK)
 async def disliked_workout(db: db_dependency, request: Request):
     #get user from request header to get user.id, then get request JSON which will hold the text that we pass into the function
-    user = get_user(db, request)
+    user = await get_user(db, request)
     workout_data = await request.json()
 
     #pass in user.id and user inputted text, function stores info into database for user.
@@ -155,7 +177,7 @@ async def disliked_workout(db: db_dependency, request: Request):
 @router.post('/keywords/liked-workout', status_code=status.HTTP_200_OK)
 async def liked_workout(db: db_dependency, request: Request):
     #get user from request header to get user.id, then get request JSON which will hold the text that we pass into the function
-    user = get_user(db, request)
+    user = await get_user(db, request)
     workout_data = await request.json()
 
     #pass in user.id and user inputted text, function stores info into database for user.
@@ -164,4 +186,59 @@ async def liked_workout(db: db_dependency, request: Request):
     return {"message": "Liked workout keywords extracted and stored"}
 
 
+@router.get("/meal-plan", status_code=status.HTTP_200_OK)
+async def get_user_meal_plan(db: db_dependency, request: Request):
+    """
+    Retrieves the current user's stored meal plan from the database.
+    """
+    print("HIT GET USER MEAL PLAN")
+    user = await get_user(db, request)
+    if not user:
+        print("User not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    
+    print("USER MEAL PLAN")
+    print(user.meal_plan)
+    
+    return {"meal_plan": user.meal_plan}
 
+
+@router.get("/workout-plan", status_code=status.HTTP_200_OK)
+async def get_user_workout_plan(db: db_dependency, request: Request):
+    """
+    Retrieves the current user's stored workout plan from the database.
+    """
+    print("HIT GET USER WORKOUT PLAN")
+    user = await get_user(db, request)
+    if not user:
+        print("User not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    
+    print("USER WORKOUT PLAN")
+    print(user.workout_plan)
+
+    return {"workout_plan": user.workout_plan}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@router.get("/all_users", response_model=list[User], status_code=status.HTTP_200_OK)
+async def get_all_users(db: db_dependency):
+    """
+    Get all users from the database.
+    """
+    statement = select(User)
+    users = db.exec(statement).all()
+    return users

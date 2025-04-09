@@ -105,5 +105,5 @@ async def access_token_login(form_data: Annotated[OAuth2PasswordRequestForm, Dep
         )
 
     print("Authentication successful for user:", user.username)
-    token = create_access_token(user.username, user.id, timedelta(minutes=10))
+    token = create_access_token(user.username, user.id, timedelta(minutes=60))
     return {'access_token': token, 'token_type': 'bearer'} 

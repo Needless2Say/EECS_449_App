@@ -19,14 +19,12 @@ engine = get_engine()
 load_dotenv()
 
 # get API key and url from .env file
-# API_KEY = os.getenv("API_KEY")
-#API_URL = os.getenv("API_URL")
-API_KEY = ''
-API_URL = 'https://openrouter.ai/api/v1/chat/completions'
+DEEPSEEK_KEY = os.getenv("DEEPSEEK_KEY")
+DEEPSEEK_URL = os.getenv("DEEPSEEK_URL")
 
 
 headers = {
-    'Authorization': f'Bearer {API_KEY}',
+    'Authorization': f'Bearer {DEEPSEEK_KEY}',
     'Content-Type': 'application/json'
 }
 
@@ -52,7 +50,7 @@ def extract_keywords_liked_meal(text: Optional[str], User_Name):
         }]
     }
 
-    response = requests.post(API_URL, json=data, headers=headers)
+    response = requests.post(DEEPSEEK_URL, json=data, headers=headers)
     response.raise_for_status()
     response_json = response.json()
     # print(json.dumps(response_json, indent=4))
@@ -113,7 +111,7 @@ def extract_keywords_disliked_meal(text: Optional[str], User_Name):
         }]
     }
     
-    response = requests.post(API_URL, json=data, headers=headers)
+    response = requests.post(DEEPSEEK_URL, json=data, headers=headers)
     response.raise_for_status()
     response_json = response.json()
     
@@ -173,7 +171,7 @@ def extract_keywords_liked_workout(text: Optional[str], User_Name: str):
         }]
     }
 
-    response = requests.post(API_URL, json=data, headers=headers)
+    response = requests.post(DEEPSEEK_URL, json=data, headers=headers)
     response.raise_for_status()
     response_json = response.json()
     content = response_json['choices'][0]['message']['content'].strip()
@@ -232,7 +230,7 @@ def extract_keywords_disliked_workout(text: Optional[str], User_Name: str):
         }]
     }
 
-    response = requests.post(API_URL, json=data, headers=headers)
+    response = requests.post(DEEPSEEK_URL, json=data, headers=headers)
     response.raise_for_status()
     response_json = response.json()
     content = response_json['choices'][0]['message']['content'].strip()
@@ -263,16 +261,15 @@ def extract_keywords_disliked_workout(text: Optional[str], User_Name: str):
             
 
 
-def create_meal_plan(User_Name):
+def create_meal_plan(user_id):
     user_context = ''
-    
+    engine = get_engine()
     with Session(engine) as session:
         # query the user by ID
-        statement = select(User).where(User.username == User_Name)
+        statement = select(User).where(User.id == user_id)
         user = session.exec(statement).first()
 
-        #print(f'---------- {user.username} ---------')
-
+        # print(f'---------- {user.username} ---------')
         user_context = (
             f"{user.age}-year-old {user.gender if user.gender else 'person'} "
             f"weighing {user.weight_kg} kg and {user.height_cm} cm tall, "
@@ -284,8 +281,8 @@ def create_meal_plan(User_Name):
             f"alergic to (DO NOT INCLUDE THESE FOODS) {user.allergies if user.allergies else 'no specific allergies'}, "
         )
 
-        #print(f'TEST on {user.first_name}: {user.liked_meals}')
-        #print(user_context)
+        # print(f'TEST on {user.first_name}: {user.liked_meals}')
+        # print(user_context)
 
         data = {
             "model": "deepseek/deepseek-chat:free",
@@ -304,21 +301,32 @@ def create_meal_plan(User_Name):
             }]
         }
 
+        # print(f"DATA TIME!!!!!!!\n {data}")
+
         # send the POST request to the DeepSeek API
-        response = requests.post(API_URL, json=data, headers=headers)
-        response_json = response.json()
-        assistant_content = response_json['choices'][0]['message']['content']
+        try:
+            # print("Sending request to DeepSeek API...")
+            response = requests.post(DEEPSEEK_URL, json=data, headers=headers)
+            # print("Request sent.")
+            response_json = response.json()
+            # print("Response received.")
+            print(json.dumps(response_json, indent=4))
+            assistant_content = response_json['choices'][0]['message']['content']
+        except requests.exceptions.RequestException as e:
+            print(f"Error: {e}")
+            return None
+
         return assistant_content
 
 
-def create_exercise_routine(User_Name):
+def create_exercise_routine(user_id):
     user_context = ''
-    
+    engine = get_engine()
     with Session(engine) as session:
-        statement = select(User).where(User.username == User_Name)
+        statement = select(User).where(User.id == user_id)
         user = session.exec(statement).first()
-        #print(f'---------- {user.username} ---------')
 
+        # print(f'---------- {user.username} ---------')
         user_context = (
             f"{user.age}-year-old {user.gender if user.gender else 'person'} "
             f"weighing {user.weight_kg} kg and {user.height_cm} cm tall, "
@@ -330,8 +338,8 @@ def create_exercise_routine(User_Name):
             f"and available to exercise {', '.join(str(day) for day in user.exercise_availability)}, "
         )
 
-        #print(f'TEST extracted liked workouts of {user.first_name}: {user.liked_workouts}')
-        #print(user_context)
+        # print(f'TEST extracted liked workouts of {user.first_name}: {user.liked_workouts}')
+        # print(user_context)
 
         data = {
             "model": "deepseek/deepseek-chat:free",
@@ -351,10 +359,21 @@ def create_exercise_routine(User_Name):
             }]
         }
         
+        # print(f"DATA TIME!!!!!!!\n {data}")
+        
         # send the POST request to the DeepSeek API
-        response = requests.post(API_URL, json=data, headers=headers)
-        response_json = response.json()
-        assistant_content = response_json['choices'][0]['message']['content']
+        try:
+            # print("Sending request to DeepSeek API...")
+            response = requests.post(DEEPSEEK_URL, json=data, headers=headers)
+            # print("Request sent.")
+            response_json = response.json()
+            # print("Response received.")
+            print(json.dumps(response_json, indent=4))
+            assistant_content = response_json['choices'][0]['message']['content']
+        except requests.exceptions.RequestException as e:
+            print(f"Error: {e}")
+            return None        
+
         return assistant_content
 
 
