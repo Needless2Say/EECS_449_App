@@ -32,6 +32,9 @@ const HomePage: React.FC = () => {
     // create authentication variable by getting return value from custom context AuthContext
     const auth = useContext(AuthContext);
 
+    // initialize router for redirecting or routing user to different pages
+    const router = useRouter();
+
     // initialize toggles for sidebar and profile menu pop up
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
@@ -39,9 +42,6 @@ const HomePage: React.FC = () => {
     // state for chat input and chat logs
     const [chatMessage, setChatMessage] = useState("");
     const [chatLogs, setChatLogs] = useState<ChatMessage[]>([]);
-
-    // initialize router for redirecting or routing user to different pages
-    const router = useRouter();
 
     // reference for profile menu (for click outside behavior)
     const profileMenuRef = useRef<HTMLDivElement>(null);
@@ -122,40 +122,31 @@ const HomePage: React.FC = () => {
 
 
     // function to handle message submit
-    const handleChatSubmit = (e: FormEvent<HTMLFormElement>) => {
-        // prevent default form submission behavior (normally reloads page)
+    const handleChatSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        // if user's message is just empty spaces, exit function
         if (chatMessage.trim() === "") return;
-
-        // add user's message (align right)
-        setChatLogs((prev) => [
-            ...prev,
-            { sender: "user", text: chatMessage.trim() },
-        ]);
-
-        // set user's message to empty string
+    
+        // immediately add user's message to UI
+        const userMessage = chatMessage.trim();
+        setChatLogs((prev) => [...prev, { sender: "user", text: userMessage }]);
         setChatMessage("");
-
-        // add temporary waiting message (align left)
-        setChatLogs((prev) => [
-            ...prev,
-            { sender: "model", text: "Waiting For Response" },
-        ]);
-
-        // after 5 seconds, remove waiting message and add final response
-        setTimeout(() => {
-            setChatLogs((prev) => {
-                // remove waiting message
-                const newLogs = prev.filter(
-                    (msg) => msg.text !== "Waiting For Response"
-                );
-
-                // add final response from model (aligned left)
-                return [...newLogs, { sender: "model", text: "CaloriQ responded" }];
-            });
-        }, 2000);
+    
+        try {
+            const response = await axios.post(
+                "http://localhost:8000/chat",
+                { message: userMessage },
+                { headers: { Authorization: `Bearer ${auth?.user?.access_token}` } }
+            );
+            const assistantReply = response.data.reply;
+            setChatLogs((prev) => [...prev, { sender: "model", text: assistantReply }]);
+        } catch (error) {
+            console.error("Failed to fetch assistant reply:", error);
+            setChatLogs((prev) => [
+                ...prev,
+                { sender: "model", text: "Error retrieving response" },
+            ]);
+        }
     };
 
 
