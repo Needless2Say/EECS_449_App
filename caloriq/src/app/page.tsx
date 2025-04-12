@@ -14,18 +14,16 @@ interface ChatMessage {
 
 interface FeedbackData {
     workout: {
-        liked: string;
-        disliked: string;
+        liked: string[];
+        disliked: string[];
         newPlan: boolean;
     };
     meals: {
-        liked: string;
-        disliked: string;
+        liked: string[];
+        disliked: string[];
         newPlan: boolean;
     };
 }
-
-
 
 
 const HomePage: React.FC = () => {
@@ -54,11 +52,26 @@ const HomePage: React.FC = () => {
     const [showSurveyPrompt, setShowSurveyPrompt] = useState(false);
     const [showSurvey, setShowSurvey] = useState(false);
     const [feedbackData, setFeedbackData] = useState<FeedbackData>({
-        workout: { liked: '', disliked: '', newPlan: false },
-        meals: { liked: '', disliked: '', newPlan: false }
+        workout: { liked: [], disliked: [], newPlan: false },
+        meals: { liked: [], disliked: [], newPlan: false }
     });
+    const [inputText, setInputText] = useState({
+        workoutLiked: "",
+        workoutDisliked: "",
+        mealsLiked: "",
+        mealsDisliked: ""
+    });
+    
+
+    // function to parse comma-separated input into an array of strings
+    const parseCommaSeparatedInput = (input: string): string[] =>
+        input
+            .split(",")
+            .map(item => item.trim())
+            .filter(item => item.length > 0);    
 
 
+    // useEffect to show survey prompt every Monday
     useEffect(() => {
         if (auth?.user) {
             const lastPrompt = localStorage.getItem('lastSurveyPrompt');
@@ -75,6 +88,7 @@ const HomePage: React.FC = () => {
     }, [auth?.user]);
 
 
+    // function to handle survey response (yes or no)
     const handleSurveyResponse = (response: boolean) => {
         setShowSurveyPrompt(false);
         if (response) {
@@ -83,19 +97,29 @@ const HomePage: React.FC = () => {
     };
 
 
+    // function to handle survey submission
     const handleSurveySubmit = async (e: FormEvent) => {
         e.preventDefault();
         try {
-            await axios.post('/api/feedback', feedbackData, {
-            headers: { Authorization: `Bearer ${auth?.user?.access_token}` }
-            });
-            setShowSurvey(false);
+            // send survey data to backend
+            const response = await axios.post(
+                "http://localhost:8000/user/weekly-survey",
+                { feedbackData },
+                { headers: { Authorization: `Bearer ${auth?.user?.access_token}` } }
+            );
+
+            console.log("Survey submitted successfully:", response.data);
+
+            // hide survey
+            // setShowSurvey(false);
+
         } catch (error) {
             console.error('Failed to submit feedback:', error);
         }
     };
 
 
+    // cancel survey and close the modal
     const handleSurveyCancel = () => {
         setShowSurvey(false);
         setShowSurveyPrompt(false);
@@ -121,7 +145,7 @@ const HomePage: React.FC = () => {
     }, [profileMenuOpen]);
 
 
-    // function to handle message submit
+    // function to handle chat message submit
     const handleChatSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -169,13 +193,10 @@ const HomePage: React.FC = () => {
             localStorage.removeItem('authToken');
             sessionStorage.removeItem('authToken');
             
-            // Redirect to login page
-            // router.push('/login');
-            
-            // Close profile menu
+            // close profile menu
             setProfileMenuOpen(false);
             
-            // Clear chat history
+            // clear chat history
             setChatLogs([]);
             setChatMessage('');
             
@@ -189,7 +210,8 @@ const HomePage: React.FC = () => {
     // function to create new chat (clear chat logs and reset home screen)
     const handleNewChat = () => {
         setChatLogs([]);
-        // optionally reset the chatMessage too
+
+        // reset chatMessage
         setChatMessage("");
     };
 
@@ -397,7 +419,7 @@ const HomePage: React.FC = () => {
             </main>
 
             {/* Survey Prompt Modal */}
-            {showSurveyPrompt && (
+            {/* {showSurveyPrompt && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg w-96">
                         <h3 className="text-xl font-semibold mb-4">Weekly Feedback Survey</h3>
@@ -418,7 +440,7 @@ const HomePage: React.FC = () => {
                         </div>
                     </div>
                 </div>
-            )}
+            )} */}
 
             {/* Survey Modal */}
             {showSurvey && (
@@ -431,23 +453,37 @@ const HomePage: React.FC = () => {
                             <h4 className="font-medium mb-2">Workout Feedback</h4>
                             <input
                                 type="text"
-                                placeholder="What did you like about the workouts?"
+                                placeholder="What workouts did you like? Ex: Incline Bench Press, Squats, etc."
                                 className="border rounded w-full p-2 mb-2"
                                 value={feedbackData.workout.liked}
-                                onChange={(e) => setFeedbackData(prev => ({
-                                    ...prev,
-                                    workout: { ...prev.workout, liked: e.target.value }
-                                }))}
+                                onChange={(e) => {
+                                    const raw = e.target.value;
+                                    setInputText(prev => ({ ...prev, workoutLiked: raw }));
+                                    setFeedbackData(prev => ({
+                                        ...prev,
+                                        workout: {
+                                            ...prev.workout,
+                                            liked: parseCommaSeparatedInput(raw)
+                                        }
+                                    }));
+                                }}
                             />
                             <input
                                 type="text"
-                                placeholder="What could be improved about the workouts?"
+                                placeholder="What workouts did you dislike? Ex: Shoulder Press, Deadlifts, etc."
                                 className="border rounded w-full p-2 mb-2"
                                 value={feedbackData.workout.disliked}
-                                onChange={(e) => setFeedbackData(prev => ({
-                                    ...prev,
-                                    workout: { ...prev.workout, disliked: e.target.value }
-                                }))}
+                                onChange={(e) => {
+                                    const raw = e.target.value;
+                                    setInputText(prev => ({ ...prev, workoutDisliked: raw }));
+                                    setFeedbackData(prev => ({
+                                        ...prev,
+                                        workout: {
+                                            ...prev.workout,
+                                            liked: parseCommaSeparatedInput(raw)
+                                        }
+                                    }));
+                                }}
                             />
                             <label className="flex items-center space-x-2">
                                 <input
@@ -468,23 +504,37 @@ const HomePage: React.FC = () => {
                             <h4 className="font-medium mb-2">Meal Feedback</h4>
                             <input
                                 type="text"
-                                placeholder="What did you like about the meals?"
+                                placeholder="What meals did you like? Ex: Chicken Salad, Quinoa Bowl, etc."
                                 className="border rounded w-full p-2 mb-2"
                                 value={feedbackData.meals.liked}
-                                onChange={(e) => setFeedbackData(prev => ({
-                                    ...prev,
-                                    meals: { ...prev.meals, liked: e.target.value }
-                                }))}
+                                onChange={(e) => {
+                                    const raw = e.target.value;
+                                    setInputText(prev => ({ ...prev, mealsLiked: raw }));
+                                    setFeedbackData(prev => ({
+                                        ...prev,
+                                        workout: {
+                                            ...prev.workout,
+                                            liked: parseCommaSeparatedInput(raw)
+                                        }
+                                    }));
+                                }}
                             />
                             <input
                                 type="text"
-                                placeholder="What could be improved about the meals?"
+                                placeholder="What meals did you dislike? Ex: Steamed Broccoli, Egg Fried Rice, etc."
                                 className="border rounded w-full p-2 mb-2"
                                 value={feedbackData.meals.disliked}
-                                onChange={(e) => setFeedbackData(prev => ({
-                                    ...prev,
-                                    meals: { ...prev.meals, disliked: e.target.value }
-                                }))}
+                                onChange={(e) => {
+                                    const raw = e.target.value;
+                                    setInputText(prev => ({ ...prev, mealsDisliked: raw }));
+                                    setFeedbackData(prev => ({
+                                        ...prev,
+                                        workout: {
+                                            ...prev.workout,
+                                            liked: parseCommaSeparatedInput(raw)
+                                        }
+                                    }));
+                                }}
                             />
                             <label className="flex items-center space-x-2">
                                 <input
