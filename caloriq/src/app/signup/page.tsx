@@ -43,13 +43,13 @@ const SignUpPage: React.FC = () => {
     const [mealPrepAvailability, setMealPrepAvailability] = useState<string[]>([]);
     const [exerciseAvailability, setExerciseAvailability] = useState<string[]>([]);
 
-    // Check if auth is available
+    // check if auth is available
     if (!auth) {
         throw new Error("AuthContext is not available! Did you forget to wrap <AuthProvider>?");
     }
     // const { login } = auth;
 
-    // Function to register new user
+    // function to register new user
     const handleRegister = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
         console.log({ username, password, email });
@@ -62,7 +62,7 @@ const SignUpPage: React.FC = () => {
                 { headers: { "Content-Type": "application/json" } }
             );
 
-            // Login user after successful registration
+            // login user after successful registration
             await auth.login(username, password);
             setShowSurvey(true);
 
@@ -71,11 +71,11 @@ const SignUpPage: React.FC = () => {
         }
     };
 
-    // Function to submit survey answers and generate plans
+    // function to submit survey answers and generate plans
     const handleSurveySubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        // Process allergies input into a formatted comma-separated string
+        // process allergies input into a formatted comma-separated string
         const allergyArray = allergies
             .split(",")
             .map((item) => item.trim())
@@ -96,7 +96,7 @@ const SignUpPage: React.FC = () => {
         });
 
         try {
-            // Send survey answers to backend
+            // send survey answers to backend
             await axios.post(
                 "http://localhost:8000/user/preferences",
                 {
@@ -115,10 +115,10 @@ const SignUpPage: React.FC = () => {
                 { headers: { Authorization: `Bearer ${auth.user?.access_token}` } }
             );
 
-            // Set loading state to show overlay
+            // set loading state to show overlay
             setLoading(true);
 
-            // Fire both the meal and workout plan API requests in parallel
+            // fire both the meal and workout plan API requests in parallel
             const [meal_response, workout_response] = await Promise.all([
                 axios.post(
                     "http://localhost:8000/user/meals",
@@ -138,7 +138,7 @@ const SignUpPage: React.FC = () => {
             setMealPlan(meal_response.data.meal_plan);
             setWorkoutPlan(workout_response.data.excercise_plan);
 
-            // Redirect the user to the home page after responses are received
+            // redirect the user to the home page after responses are received
             router.push("/");
 
         } catch (error) {
@@ -148,7 +148,7 @@ const SignUpPage: React.FC = () => {
         }
     };
 
-    // Profile menu state and reference for clicking outside
+    // profile menu state and reference for clicking outside
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
     const profileMenuRef = useRef<HTMLDivElement>(null);
     const toggleProfileMenu = () => setProfileMenuOpen((prev) => !prev);

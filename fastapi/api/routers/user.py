@@ -141,49 +141,49 @@ async def gen_workout_plan(db: db_dependency, request: Request):
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error generating workout plan: {str(e)}")
 
-@router.post('/keywords/liked-meal', status_code=status.HTTP_200_OK)
-async def liked_meal(db: db_dependency, request: Request):
-    #get user from request header to get user.id, then get request JSON which will hold the text that we pass into the function
-    user = await get_user(db, request)
-    meal_data = await request.json()
+# @router.post('/keywords/liked-meal', status_code=status.HTTP_200_OK)
+# async def liked_meal(db: db_dependency, request: Request):
+#     #get user from request header to get user.id, then get request JSON which will hold the text that we pass into the function
+#     user = await get_user(db, request)
+#     meal_data = await request.json()
 
-    #pass in user.id and user inputted text, function stores info into database for user.
-    extract_keywords_liked_meal(meal_data.get("text"), user.id)
+#     #pass in user.id and user inputted text, function stores info into database for user.
+#     extract_keywords_liked_meal(meal_data.get("text"), user.id)
 
-    return {"message": "Liked meal keywords extracted and stored"}
+#     return {"message": "Liked meal keywords extracted and stored"}
 
-@router.post('/keywords/disliked-meal', status_code=status.HTTP_200_OK)
-async def disliked_meal(db: db_dependency, request: Request):
-    #get user from request header to get user.id, then get request JSON which will hold the text that we pass into the function
-    user = await get_user(db, request)
-    meal_data = await request.json()
+# @router.post('/keywords/disliked-meal', status_code=status.HTTP_200_OK)
+# async def disliked_meal(db: db_dependency, request: Request):
+#     #get user from request header to get user.id, then get request JSON which will hold the text that we pass into the function
+#     user = await get_user(db, request)
+#     meal_data = await request.json()
 
-    #pass in user.id and user inputted text, function stores info into database for user.
-    extract_keywords_disliked_meal(meal_data.get("text"), user.id)
+#     #pass in user.id and user inputted text, function stores info into database for user.
+#     extract_keywords_disliked_meal(meal_data.get("text"), user.id)
 
-    return {"message": "Disliked meal keywords extracted and stored"}
+#     return {"message": "Disliked meal keywords extracted and stored"}
 
-@router.post('/keywords/disliked-workout', status_code=status.HTTP_200_OK)
-async def disliked_workout(db: db_dependency, request: Request):
-    #get user from request header to get user.id, then get request JSON which will hold the text that we pass into the function
-    user = await get_user(db, request)
-    workout_data = await request.json()
+# @router.post('/keywords/disliked-workout', status_code=status.HTTP_200_OK)
+# async def disliked_workout(db: db_dependency, request: Request):
+#     #get user from request header to get user.id, then get request JSON which will hold the text that we pass into the function
+#     user = await get_user(db, request)
+#     workout_data = await request.json()
 
-    #pass in user.id and user inputted text, function stores info into database for user.
-    extract_keywords_disliked_workout(workout_data.get("text"), user.id)
+#     #pass in user.id and user inputted text, function stores info into database for user.
+#     extract_keywords_disliked_workout(workout_data.get("text"), user.id)
 
-    return {"message": "Disliked workout keywords extracted and stored"}
+#     return {"message": "Disliked workout keywords extracted and stored"}
 
-@router.post('/keywords/liked-workout', status_code=status.HTTP_200_OK)
-async def liked_workout(db: db_dependency, request: Request):
-    #get user from request header to get user.id, then get request JSON which will hold the text that we pass into the function
-    user = await get_user(db, request)
-    workout_data = await request.json()
+# @router.post('/keywords/liked-workout', status_code=status.HTTP_200_OK)
+# async def liked_workout(db: db_dependency, request: Request):
+#     #get user from request header to get user.id, then get request JSON which will hold the text that we pass into the function
+#     user = await get_user(db, request)
+#     workout_data = await request.json()
 
-    #pass in user.id and user inputted text, function stores info into database for user.
-    extract_keywords_liked_workout(workout_data.get("text"), user.id)
+#     #pass in user.id and user inputted text, function stores info into database for user.
+#     extract_keywords_liked_workout(workout_data.get("text"), user.id)
 
-    return {"message": "Liked workout keywords extracted and stored"}
+#     return {"message": "Liked workout keywords extracted and stored"}
 
 
 @router.get("/meal-plan", status_code=status.HTTP_200_OK)
@@ -218,6 +218,29 @@ async def get_user_workout_plan(db: db_dependency, request: Request):
     print(user.workout_plan)
 
     return {"workout_plan": user.workout_plan}
+
+
+# @router.post("/weekly-survey", status_code=status.HTTP_200_OK)
+# async def post_weekly_survey(db: db_dependency, request: Request):
+#     """
+#     Store user's weekly satisfaction survey response in the database
+#     """
+#     # get user from database
+#     user = await get_user(db, request)
+#     if not user:
+#         print("User not found")
+#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+#     # get survey data from request
+#     survey_data = (await request.json())["feedbackData"]
+
+#     # 
+
+
+
+
+#     return {"survey_data": survey_data}
+
 
 
 
