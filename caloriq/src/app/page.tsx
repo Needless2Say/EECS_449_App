@@ -50,7 +50,7 @@ const HomePage: React.FC = () => {
 
     // states for weekly feedback survey
     const [showSurveyPrompt, setShowSurveyPrompt] = useState(false);
-    const [showSurvey, setShowSurvey] = useState(false);
+    const [showSurvey, setShowSurvey] = useState(true);
     const [feedbackData, setFeedbackData] = useState<FeedbackData>({
         workout: { liked: [], disliked: [], newPlan: false },
         meals: { liked: [], disliked: [], newPlan: false }
@@ -61,7 +61,11 @@ const HomePage: React.FC = () => {
         mealsLiked: "",
         mealsDisliked: ""
     });
-    
+
+    // loading state for overlay
+    const [loading, setLoading] = useState(false);
+
+
 
     // function to parse comma-separated input into an array of strings
     const parseCommaSeparatedInput = (input: string): string[] =>
@@ -101,6 +105,12 @@ const HomePage: React.FC = () => {
     const handleSurveySubmit = async (e: FormEvent) => {
         e.preventDefault();
         try {
+            // hide survey
+            setShowSurvey(false);
+
+            // set loading state to show overlay
+            setLoading(true);
+
             // send survey data to backend
             const response = await axios.post(
                 "http://localhost:8000/user/weekly-survey",
@@ -108,13 +118,18 @@ const HomePage: React.FC = () => {
                 { headers: { Authorization: `Bearer ${auth?.user?.access_token}` } }
             );
 
-            console.log("Survey submitted successfully:", response.data);
-
             // hide survey
-            // setShowSurvey(false);
+            setShowSurvey(false);
+
+            // set loading state to show overlay
+            setLoading(true);
+
+            console.log("Survey submitted successfully:", response.data);
 
         } catch (error) {
             console.error('Failed to submit feedback:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -566,6 +581,14 @@ const HomePage: React.FC = () => {
                             </button>
                         </div>
                     </form>
+                </div>
+            )}
+
+            {/* Loading Overlay */}
+            {loading && (
+                <div className="fixed inset-0 flex flex-col items-center justify-center bg-gray-800 bg-opacity-75 z-50">
+                    <p className="text-white mb-4 text-lg">Loading Your Meal And Workout Plan</p>
+                    <div className="w-16 h-16 border-4 border-t-4 border-gray-200 rounded-full animate-spin"></div>
                 </div>
             )}
 
